@@ -1,0 +1,43 @@
+<div>
+  <ng-container
+    *ngTemplateOutlet="treeviewTemplate; context: { nodes: treeNodes }"
+  ></ng-container>
+
+  <div
+    *ngIf="contextMenuVisible"
+    [style.top.px]="contextMenuPosition.y"
+    [style.left.px]="contextMenuPosition.x"
+    class="context-menu"
+  >
+    <ul>
+      <li (click)="addNode(selectedNode, 'New Folder', false)">Add Folder</li>
+      <li (click)="addNode(selectedNode, 'New File', true)">Add File</li>
+      <li (click)="removeNode(selectedNode)">Remove</li>
+    </ul>
+  </div>
+</div>
+
+<ng-template #treeviewTemplate let-nodes="nodes">
+  <div *ngFor="let node of nodes" class="tree-node">
+    <div class="node-header" (contextmenu)="onRightClick($event, node)">
+      <div class="node-header-cb"><input type="checkbox" /></div>
+      <div class="node-header-txt">
+        <span (click)="toggleExpandCollapse(node)">
+          {{ node.name }}
+        </span>
+        <span *ngIf="!node.isFolder" class="small-txt"
+          >12-12-2012 14:66:77 | 0 Dataset</span
+        >
+      </div>
+      <div class="node-header-ctx">
+        <i class="fa-solid fa-ellipsis-vertical"></i>
+      </div>
+    </div>
+
+    <div *ngIf="node.isExpanded && node.children">
+      <ng-container
+        *ngTemplateOutlet="treeviewTemplate; context: { nodes: node.children }"
+      ></ng-container>
+    </div>
+  </div>
+</ng-template>

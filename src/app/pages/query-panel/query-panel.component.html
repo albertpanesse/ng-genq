@@ -1,0 +1,14 @@
+<div class="container">
+  <h2>Query</h2>
+  <form [formGroup]="queryForm" (ngSubmit)="onQuery()">
+    <div class="form-group">
+      <label for="sql">SQL Query</label>
+      <input id="sql" type="text" formControlName="sql" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Execute Query</button>
+  </form>
+  <div *ngIf="queryResult">
+    <h3>Query Result</h3>
+    <pre>{{ queryResult | json }}</pre>
+  </div>
+</div>
