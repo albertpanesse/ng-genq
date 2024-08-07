@@ -3,6 +3,7 @@ import { TreeviewModule } from "../../components/treeview/treeview.module";
 import { TreeNode } from "../../components/treeview/treeview.types";
 import { FileUploadModalComponent, ModalComponent } from "../../components/modals";
 import { DialogModalService } from "../../lib/services/dialog-modal.service";
+import { EActionType } from "../../lib/types";
 
 const treeNodes: TreeNode[] = [
   {
@@ -37,17 +38,29 @@ const treeNodes: TreeNode[] = [
   standalone: true,
 })
 export class FileManagerComponent {
+  actionType = EActionType;
   treeNodes = treeNodes;
 
   constructor(private dialogModalService: DialogModalService) {}
 
-  handlerOnFileAdd = () => {
-    this.allButtonActionWithModal(FileUploadModalComponent);
+  handlerOnAllAction = (actionType: EActionType) => {
+    switch (actionType) {
+      case EActionType.AT_FILE_UPLOAD:
+        this.openModalWithCallback(FileUploadModalComponent, {
+          onAction1: null,
+          onAction2: null,
+        });
+        break;
+    }
   }
 
-  allButtonActionWithModal = (
-    modal: ModalComponent
-  ) => {
+  openModalWithCallback(
+    modal: ModalComponent,
+    callback: {
+      onAction1: any,
+      onAction2: any,
+    },
+  ) {
     const modalRef = this.dialogModalService.openModal(modal);
   }
 }
