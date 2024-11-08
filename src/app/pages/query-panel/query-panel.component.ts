@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { QueryService } from '../../lib/services/query.service';
+import { QueryService } from '../../libs/services/query.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
