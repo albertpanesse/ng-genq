@@ -4,7 +4,7 @@ import { DefaultLayoutComponent } from './layout';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'dashboard',
+    redirectTo: 'dsb',
     pathMatch: 'full'
   },
   {
@@ -15,8 +15,12 @@ export const routes: Routes = [
     },
     children: [
       {
-        path: 'dashboard',
-        loadChildren: () => import('./views/dashboard/routes').then((m) => m.routes)
+        path: 'dsb',
+        loadChildren: () => import('./pages/dashboard/routes').then((m) => m.routes)
+      },
+      {
+        path: 'frp',
+        loadChildren: () => import('./pages/file-repository/routes').then((m) => m.routes)
       },
       {
         path: 'theme',

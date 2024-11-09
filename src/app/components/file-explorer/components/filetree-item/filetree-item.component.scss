@@ -1,0 +1,22 @@
+.filetree-item-wrapper {
+  display: flex;
+  flex-direction: column;
+
+  .filetree-item-checkbox {
+    display: block;
+  }
+
+  .filetree-item-info {
+    display: flex;
+    flex-direction: column;
+
+    .filetree-item-title {
+      display: block;
+    }
+
+    .filetree-item-detail {
+      display: flex;
+      flex-direction: row;
+    }
+  }
+}
