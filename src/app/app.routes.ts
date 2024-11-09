@@ -23,41 +23,21 @@ export const routes: Routes = [
         loadChildren: () => import('./pages/file-repository/routes').then((m) => m.routes)
       },
       {
-        path: 'theme',
-        loadChildren: () => import('./views/theme/routes').then((m) => m.routes)
+        path: 'eds',
+        loadChildren: () => import('./pages/external-data-source/routes').then((m) => m.routes)
       },
       {
-        path: 'base',
-        loadChildren: () => import('./views/base/routes').then((m) => m.routes)
+        path: 'dqp',
+        loadChildren: () => import('./pages/data-query-pipeline/routes').then((m) => m.routes)
       },
       {
-        path: 'buttons',
-        loadChildren: () => import('./views/buttons/routes').then((m) => m.routes)
+        path: 'dmg',
+        loadChildren: () => import('./pages/dataset-management/routes').then((m) => m.routes)
       },
       {
-        path: 'forms',
-        loadChildren: () => import('./views/forms/routes').then((m) => m.routes)
+        path: 'dvz',
+        loadChildren: () => import('./pages/data-visualization/routes').then((m) => m.routes)
       },
-      {
-        path: 'icons',
-        loadChildren: () => import('./views/icons/routes').then((m) => m.routes)
-      },
-      {
-        path: 'notifications',
-        loadChildren: () => import('./views/notifications/routes').then((m) => m.routes)
-      },
-      {
-        path: 'widgets',
-        loadChildren: () => import('./views/widgets/routes').then((m) => m.routes)
-      },
-      {
-        path: 'charts',
-        loadChildren: () => import('./views/charts/routes').then((m) => m.routes)
-      },
-      {
-        path: 'pages',
-        loadChildren: () => import('./views/pages/routes').then((m) => m.routes)
-      }
     ]
   },
   {

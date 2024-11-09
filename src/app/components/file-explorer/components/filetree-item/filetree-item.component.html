@@ -1,4 +1,4 @@
-<div class="filetree-item-wrapper">
+<div class="filetree-item-wrapper" [ngClass]="{ 'filetree-item-selected': isSelected }">
   <div class="filetree-item-checkbox">
     <input type="checkbox" />
   </div>
@@ -7,5 +7,8 @@
     <div class="filetree-item-detail">
       <span>{{ item?.lastUpdate }}</span><span>{{ item?.fileSize }}</span>
     </div>  
+  </div>
+  <div class="filetree-item-button">
+    <button #selectButton cButton variant="outline" (click)="handlerOnFiletreeItemSelect(item!)" (blur)="handlerOnFiletreeItemUnselect()"><svg [cIcon]="icons.cilArrowRight" width="16"></svg></button>
   </div>
 </div>

@@ -6,7 +6,8 @@ export enum EFileType {
   CSV,
   GZ,
   CSVGZ,
-  RAW
+  RAW,
+  NONE
 }
 
 export interface ITreeItem {
@@ -15,6 +16,7 @@ export interface ITreeItem {
   isDir: boolean;
   fileType: EFileType;
   fileSize: number;
+  children?: ITreeItem[];
   lastUpdate: string;
 }
 

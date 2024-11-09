@@ -1,0 +1,11 @@
+.file-browser-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+
+  .file-browser-item {
+    display: block;
+    background-color: #cdcdcd;
+    padding: 10px;
+  }
+}

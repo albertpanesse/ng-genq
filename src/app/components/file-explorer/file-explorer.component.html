@@ -1,14 +1,24 @@
-<div class="file-exp-wrapper">
-  <div class="file-exp-buttons">
+<div class="file-explorer-main-wrapper">
+  <div class="file-explorer-buttons">
     <button cButton variant="outline" title="File Upload"><svg [cIcon]="icons.cilArrowThickFromBottom" width="16"></svg></button>
   </div>
-  <div class="file-exp-filetree">
-    <div *ngIf="items.length > 0">
-      <div class="file-exp-filetree-item-wrapper" *ngFor="let item of items; let idx = index">
-        <filetree-item-comp [item]="item"></filetree-item-comp>
+  <div class="file-explorer-wrapper">
+    <div class="file-explorer-filetree">
+      <div *ngIf="items.length > 0">
+        <div class="file-explorer-filetree-item-wrapper" *ngFor="let item of items; let idx = index">
+          <filetree-item-comp
+            *ngIf="item.isDir"
+            [item]="item"
+            [isSelected]="currentActiveItem?.id == item.id"
+            (onFiletreeItemSelect)="handlerOnFiletreeItemSelect($event)"
+            (onFiletreeItemUnselect)="handlerOnFiletreeItemUnselect()"
+          ></filetree-item-comp>
+        </div>
       </div>
     </div>
-    <div *ngIf="items.length == 0">No Files</div>
+    <div class="file-explorer-browser">
+      <file-browser-comp [items]="currentActiveItem && currentActiveItem.children && currentActiveItem.children.length > 0 ? currentActiveItem.children : items"></file-browser-comp>
+      <div *ngIf="!currentActiveItem && items.length == 0">No Files</div>
+    </div>  
   </div>
-  <div class="file-exp-browser"></div>
 </div>

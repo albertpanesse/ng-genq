@@ -12,8 +12,23 @@ export const navItems: INavData[] = [
     iconComponent: { name: 'cil-library' },
   },
   {
-    name: 'Datasets Management',
+    name: 'External Data Source',
+    url: '/eds',
+    iconComponent: { name: 'cil-cloudy' },
+  },
+  {
+    name: 'Data Query Pipeline',
+    url: '/dqp',
+    iconComponent: { name: 'cil-zoom' },
+  },
+  {
+    name: 'Dataset Management',
     url: '/dmg',
     iconComponent: { name: 'cil-storage' },
+  },
+  {
+    name: 'Data Visualization',
+    url: '/dvz',
+    iconComponent: { name: 'cil-chart-line' },
   },
 ];
