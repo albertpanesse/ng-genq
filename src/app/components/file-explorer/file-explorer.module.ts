@@ -10,14 +10,20 @@ export enum EFileType {
   NONE
 }
 
-export interface ITreeItem {
+export interface IFileItem {
   id: string;
   title: string;
   isDir: boolean;
   fileType: EFileType;
   fileSize: number;
   children?: ITreeItem[];
-  lastUpdate: string;
+  lastUpdate: string;  
+}
+
+export interface ITreeItem {
+  fileItem: IFileItem;
+  isExpanded: boolean;
+  isOpened: boolean;
 }
 
 @NgModule({

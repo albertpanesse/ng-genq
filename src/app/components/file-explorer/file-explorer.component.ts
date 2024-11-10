@@ -5,7 +5,7 @@ import { cilArrowThickFromBottom } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 import { ButtonDirective } from '@coreui/angular';
 
-import { FiletreeItemComponent, FileBrowserComponent } from "./components";
+import { DirectoryTreeComponent, FileBrowserComponent } from "./components";
 import { ITreeItem } from "./file-explorer.module";
 
 @Component({
@@ -13,19 +13,15 @@ import { ITreeItem } from "./file-explorer.module";
   templateUrl: 'file-explorer.component.html',
   styleUrls: ['file-explorer.component.scss'],
   standalone: true,
-  imports: [ButtonDirective, CommonModule, FiletreeItemComponent, FileBrowserComponent, IconDirective]
+  imports: [ButtonDirective, CommonModule, DirectoryTreeComponent, FileBrowserComponent, IconDirective]
 })
 export class FileExplorerComponent {
   @Input() items: ITreeItem[] = [];
  
   icons = { cilArrowThickFromBottom };
-  currentActiveItem: ITreeItem | null = null;
+  currentActiveDirectory: ITreeItem | null = null;
 
-  handlerOnFiletreeItemSelect = (item: ITreeItem) => {
-    this.currentActiveItem = item;
-  }
-
-  handlerOnFiletreeItemUnselect = () => {
-    this.currentActiveItem = null;
+  handlerOnDirectorySelected = (item: ITreeItem) => {
+    this.currentActiveDirectory = item;
   }
 }

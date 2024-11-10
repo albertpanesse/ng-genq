@@ -17,7 +17,7 @@ export class FileBrowserComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['items'] && changes['items'].currentValue && (changes['items'].currentValue as ITreeItem[]).length > 0) {
-      this.filteredItems = (changes['items'].currentValue as ITreeItem[]).filter(item => !item.isDir);
+      this.filteredItems = (changes['items'].currentValue as ITreeItem[]).filter(item => !item.fileItem.isDir);
     }
   }
 }
