@@ -27,6 +27,9 @@ import {
 } from '@coreui/angular';
 
 import { IconDirective } from '@coreui/icons-angular';
+import { Store } from '@ngrx/store';
+import { IGlobalState } from 'src/app/libs/store';
+import { ResetUser, SetIsUserLoggedIn } from 'src/app/libs/store/actions';
 
 @Component({
   selector: 'app-default-header',
@@ -50,7 +53,7 @@ export class DefaultHeaderComponent extends HeaderComponent {
     return this.colorModes.find(mode => mode.name === currentMode)?.icon ?? 'cilSun';
   });
 
-  constructor() {
+  constructor(private store: Store<IGlobalState>) {
     super();
   }
 
@@ -131,4 +134,8 @@ export class DefaultHeaderComponent extends HeaderComponent {
     { id: 4, title: 'Angular Version', value: 100, color: 'success' }
   ];
 
+  handerOnClick_AccountLogout = () => {
+    this.store.dispatch(SetIsUserLoggedIn({ isUserLoggedIn: false }));
+    this.store.dispatch(ResetUser());
+  }
 }

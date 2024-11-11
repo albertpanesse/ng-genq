@@ -1,17 +1,33 @@
 import { Routes } from '@angular/router';
-import { DefaultLayoutComponent } from './layout';
+import { AuthGuard } from './libs/guards';
+import { CleanLayoutComponent, DefaultLayoutComponent } from './layout';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'dsb',
+    redirectTo: '-/dsb',
     pathMatch: 'full'
   },
   {
     path: '',
+    component: CleanLayoutComponent,
+    children: [
+      {
+        path: 'sign-in',
+        loadChildren: () => import('./pages/sign-in/routes').then((m) => m.routes)
+      },
+      {
+        path: 'register',
+        loadChildren: () => import('./pages/register/routes').then((m) => m.routes)
+      }
+    ]
+  },
+  {
+    path: '-',
+    canActivate: [AuthGuard],
     component: DefaultLayoutComponent,
     data: {
-      title: 'Home'
+      title: 'Home',
     },
     children: [
       {
