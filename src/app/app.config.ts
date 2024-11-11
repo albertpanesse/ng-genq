@@ -8,10 +8,12 @@ import {
   withRouterConfig,
   withViewTransitions
 } from '@angular/router';
+import { StoreModule } from '@ngrx/store';
 
 import { DropdownModule, SidebarModule } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { routes } from './app.routes';
+import { reducers, metaReducers } from './libs/store/index';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -27,7 +29,7 @@ export const appConfig: ApplicationConfig = {
       withViewTransitions(),
       withHashLocation()
     ),
-    importProvidersFrom(SidebarModule, DropdownModule),
+    importProvidersFrom(SidebarModule, DropdownModule, StoreModule.forRoot(reducers, { metaReducers })),
     IconSetService,
     provideAnimations()
   ]
