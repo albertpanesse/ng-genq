@@ -1,6 +1,8 @@
-import { fromPromise, setup } from "xstate";
-import { IUser } from "../models";
-import { signingIn, signingOut } from "../apis";
+import { assign, fromPromise, setup } from "xstate";
+import { IUser } from "../../models";
+import { signingIn, signingOut } from "../../apis";
+import { IAuthResponsePayload, ICommonFunctionResult } from "../../types";
+import { showAlert } from "../helpers/alert.helper";
 
 export interface IStateAuthContext {
   isSignedIn: boolean;
@@ -25,16 +27,13 @@ export const authStateMachine = setup({
     context: {} as IStateAuthContext,
     events: {} as IStateAuthEvent<'event.signingIn', TEventAuthSigningInParams> | IStateAuthEvent<'event.signingOut'>,
   },
-  actions: {
-    updateContext: (_, params: any) => {},
-  },
   actors: {
     'actor.signingIn': fromPromise(signingIn),
     'actor.signingOut': fromPromise(signingOut),
   },
 })
   .createMachine({
-    id: 'authMachine',
+    id: 'authStateMachine',
     context: {
       isSignedIn: false,
       user: null,
@@ -48,7 +47,9 @@ export const authStateMachine = setup({
         on: {
           'event.signingIn': {
             target: 'signingIn',
-            actions: ({ context, event }) => (context.credential = event.params as TEventAuthSigningInParams),
+            actions: assign({
+              credential: ({ event }) => event.params as TEventAuthSigningInParams,
+            }),
           }
         }
       },
@@ -58,15 +59,22 @@ export const authStateMachine = setup({
           input: ({ context: { credential } }) => ({ credential }),
           onDone: {
             target: 'signedIn',
-            actions: [
-              { type: 'updateContext', params: {} }
-            ],
+            actions: [({ context, event }) => {
+              if (event.output && event.output.success) {
+                const payload = event.output as ICommonFunctionResult<IAuthResponsePayload>;
+                context = {
+                  ...context,
+                  ...payload,
+                };
+              }
+            }],
           },
           onError: {
-            target: 'signingInRetry',
+            target: 'signingInError',
           }
         }
       },
+      'signingInError': {},
       'signingInRetry': {
         type: 'final',
       },
@@ -77,10 +85,11 @@ export const authStateMachine = setup({
             target: 'signedOut',
           },
           onError: {
-            target: 'signingOutRetry',
+            target: 'signingOutError',
           }
         }
       },
+      'signingOutError': {},
       'signingOutRetry': {
         type: 'final',
       },

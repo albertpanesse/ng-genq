@@ -1,0 +1,8 @@
+<c-toaster [placement]="'top-end'" class="p-3" position="fixed">
+  <c-toast [autohide]="false" [visible]="visible()">
+    <c-toast-header>
+      {{ title }}
+    </c-toast-header>
+    <c-toast-body>{{ message }}</c-toast-body>
+  </c-toast>
+</c-toaster>

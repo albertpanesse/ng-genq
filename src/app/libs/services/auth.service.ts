@@ -3,24 +3,31 @@ import { Injectable } from '@angular/core';
 import { createActor } from 'xstate';
 import { Observable } from 'rxjs';
 
-import { authStateMachine, IStateAuthContext } from '../state-machines/auth.machine';
+import { AlertService, EAlertType, IAlert } from '../services/alert.service';
+import { authStateMachine } from './state-machines/auth.machine';
+import { createAlert } from './helpers/alert.helper';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private authActor = createActor(authStateMachine);
+  private authActor: any;
 
-  constructor() {
-    this.authActor.start();
+  constructor(private alertService: AlertService) {
+    this.authActor = createActor(authStateMachine).start();
+
     this.authActor.subscribe((snapshot: any) => {
       console.log('snapshot', snapshot);
-    });
+      if (snapshot.value === 'signingInError') {
+        const alert = createAlert('Error', 'Error jee mas!', EAlertType.ERROR);
+        this.alertService.display(alert);  
+      }
+    })
   }
 
   get state$(): Observable<any> {
     return new Observable(observer => {
-      this.authActor.subscribe(state => observer.next(state));
+      this.authActor.subscribe((state: any) => observer.next(state));
     });
   }
 
