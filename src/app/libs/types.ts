@@ -8,10 +8,12 @@ export interface IApiResponse {
   timestamp: string;
 }
 
-export interface IAuthResponsePayload {
+export interface IAuthSigningInResponsePayload {
   accessToken: string;
   refreshToken: string;
 }
+
+export interface IFileManagerUploadingResponsePayload {}
 
 export interface IErrorObject {
   code: EError;

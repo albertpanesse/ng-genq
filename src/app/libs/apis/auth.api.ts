@@ -1,6 +1,6 @@
-import { EError, IApiResponse, IAuthResponsePayload, ICommonFunctionResult, IErrorObject } from "../types";
+import { IAuthSigningInResponsePayload, ICommonFunctionResult } from "../types";
 
-export const signingIn = async ({ input: { credential } }: any): Promise<ICommonFunctionResult<IAuthResponsePayload>> => {
+export const signingIn = async ({ input: { credential } }: any): Promise<ICommonFunctionResult<IAuthSigningInResponsePayload>> => {
   try {
     const result = await fetch('http://10.147.17.139:3000/auth/signin', {
       method: 'POST',
@@ -14,8 +14,8 @@ export const signingIn = async ({ input: { credential } }: any): Promise<ICommon
     if (jsonBody.statusCode == 200) {
       return {
         success: true,
-        payload: jsonBody.payload as IAuthResponsePayload,
-      } as ICommonFunctionResult<IAuthResponsePayload>;    
+        payload: jsonBody.payload as IAuthSigningInResponsePayload,
+      } as ICommonFunctionResult<IAuthSigningInResponsePayload>;    
     } else {
       throw new Error('Authentication failed');
     }
