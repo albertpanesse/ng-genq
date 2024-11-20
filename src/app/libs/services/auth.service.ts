@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { createActor } from 'xstate';
 import { Observable } from 'rxjs';
 
-import { authStateMachine } from '../state-machines/auth.machine';
+import { authStateMachine } from './state-machines/auth.machine';
+import { CommonUIService, createAlert, EAlertType } from './common-ui.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,14 +11,13 @@ import { authStateMachine } from '../state-machines/auth.machine';
 export class AuthService {
   private authActor: any;
 
-  constructor() {
+  constructor(private commonUIService: CommonUIService) {
     this.authActor = createActor(authStateMachine).start();
 
     this.authActor.subscribe((snapshot: any) => {
       console.log('snapshot', snapshot);
       if (snapshot.value === 'signingInError') {
-        // const alert = createAlert('Error', 'Error jee mas!', EAlertType.ERROR);
-        // this.alertService.display(alert);  
+        this.commonUIService.setAlert(createAlert(EAlertType.AT_ERROR, 'ERror', 'ERROR!!!!!!!!!!'));
       }
     })
   }

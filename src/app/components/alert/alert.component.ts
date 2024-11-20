@@ -1,15 +1,16 @@
+import { CommonModule } from "@angular/common";
 import { Component, Input, OnInit, signal } from "@angular/core";
 import { ToastModule } from "@coreui/angular";
+import { IAlert } from "src/app/libs/services";
 
 @Component({
   selector: 'alert-comp',
   templateUrl: './alert.component.html',
   standalone: true,
-  imports: [ToastModule],
+  imports: [CommonModule, ToastModule],
 })
 export class AlertComponent implements OnInit {
-  title: string = 'Test';
-  message: string = 'Test Doank Bro!';
+  @Input() alerts: IAlert[] = [];
 
   visible = signal(true);
 

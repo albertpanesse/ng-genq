@@ -1,0 +1,45 @@
+import { Injectable } from "@angular/core";
+import { BehaviorSubject } from "rxjs";
+
+const DEFAULT_TIMEOUT = 3000;
+
+export enum EAlertType {
+  AT_INFO,
+  AT_WARNING,
+  AT_ERROR,
+}
+
+export interface IAlert {
+  type: EAlertType;
+  title: string;
+  message: string;
+  timeout: number;
+  triggered: boolean;
+}
+
+export const createAlert = function(type: EAlertType, title: string, message: string) {
+  return {
+    type,
+    title,
+    message,
+    timeout: DEFAULT_TIMEOUT,
+    triggered: false,
+  };
+}
+
+@Injectable({
+  providedIn: 'root',
+})
+export class CommonUIService {
+  private _alertSubject$: BehaviorSubject<IAlert[]> = new BehaviorSubject([] as IAlert[]);
+
+  getAlertSubject(): BehaviorSubject<IAlert[]> {
+    return this._alertSubject$;
+  }
+
+  setAlert(alert: IAlert): void {
+    const currentAlerts = this._alertSubject$.getValue() as IAlert[];
+    currentAlerts.push(alert);
+    this._alertSubject$.next(currentAlerts);
+  }
+}

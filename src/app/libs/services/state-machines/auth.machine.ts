@@ -1,7 +1,7 @@
 import { assign, fromPromise, setup } from "xstate";
-import { IUser } from "../models";
-import { signingIn, signingOut } from "../apis";
-import { IAuthSigningInResponsePayload, ICommonFunctionResult } from "../types";
+import { IUser } from "../../models";
+import { signingIn, signingOut } from "../../apis";
+import { IAuthSigningInResponsePayload, ICommonFunctionResult } from "../../types";
 
 export interface IStateAuthContext {
   isSignedIn: boolean;
