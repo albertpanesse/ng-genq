@@ -1,6 +1,13 @@
 import { assign, fromPromise, setup } from "xstate";
-import { ICommonFunctionResult, IFileManagerUploadingResponsePayload } from "../types";
-import { copying, cutting, deleting, pasting, uploading } from "../apis";
+import { ICommonFunctionResult, IFileManagerUploadingResponsePayload } from "../../types";
+import { creating, deleting, moving, uploading } from "../../apis";
+import { ApiService, CommonUIService } from "../";
+import { IRootContext } from ".";
+
+export interface IStateFileManagerServices {
+  apiService: ApiService;
+  commonUIService: CommonUIService;
+}
 
 export interface IStateFileManagerContext {};
 
@@ -11,28 +18,24 @@ interface IStateFileManagerEvent<T1, T2 = void> {
 
 interface TEventFileManagerUploadingParams {}
 
-interface TEventFileManagerCopyingParams {}
+interface TEventFileManagerCreatingParams {}
 
-interface TEventFileManagerCuttingParams {}
-
-interface TEventFileManagerPastingParams {}
+interface TEventFileManagerMovingParams {}
 
 interface TEventFileManagerDeletingParams {}
 
 export const fileManagerStateMachine = setup({
   types: {
-    context: {} as IStateFileManagerContext,
+    context: {} as IRootContext<IStateFileManagerServices, IStateFileManagerContext>,
     events: {} as IStateFileManagerEvent<'event.uploading', TEventFileManagerUploadingParams> | 
-      IStateFileManagerEvent<'event.copying', TEventFileManagerCopyingParams> | 
-      IStateFileManagerEvent<'event.cutting', TEventFileManagerCuttingParams> | 
-      IStateFileManagerEvent<'event.pasting', TEventFileManagerPastingParams> | 
+      IStateFileManagerEvent<'event.creating', TEventFileManagerCreatingParams> | 
+      IStateFileManagerEvent<'event.moving', TEventFileManagerMovingParams> | 
       IStateFileManagerEvent<'event.deleting', TEventFileManagerDeletingParams>,
   },
   actors: {
     'actor.uploading': fromPromise(uploading),
-    'actor.copying': fromPromise(copying),
-    'actor.cutting': fromPromise(cutting),
-    'actor.pasting': fromPromise(pasting),
+    'actor.creating': fromPromise(creating),
+    'actor.moving': fromPromise(moving),
     'actor.deleting': fromPromise(deleting),
   },
 })
@@ -49,22 +52,16 @@ export const fileManagerStateMachine = setup({
               credential: ({ event }) => event.params as TEventFileManagerUploadingParams,
             }),
           },
-          'event.copying': {
-            target: 'copying',
+          'event.creating': {
+            target: 'creating',
             actions: assign({
-              credential: ({ event }) => event.params as TEventFileManagerCopyingParams,
+              credential: ({ event }) => event.params as TEventFileManagerCreatingParams,
             }),
           },
-          'event.cutting': {
-            target: 'cutting',
+          'event.moving': {
+            target: 'moving',
             actions: assign({
-              credential: ({ event }) => event.params as TEventFileManagerCuttingParams,
-            }),
-          },
-          'event.pasting': {
-            target: 'pasting',
-            actions: assign({
-              credential: ({ event }) => event.params as TEventFileManagerPastingParams,
+              credential: ({ event }) => event.params as TEventFileManagerMovingParams,
             }),
           },
           'event.deleting': {

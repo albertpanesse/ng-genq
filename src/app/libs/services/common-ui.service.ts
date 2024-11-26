@@ -47,6 +47,6 @@ export class CommonUIService {
   }
 
   pageRedirect(path: string): void {
-    this.router.navigate([path]);
+    this.router.navigate([path], { replaceUrl: true });
   }
 }

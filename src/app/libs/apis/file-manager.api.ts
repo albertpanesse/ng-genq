@@ -1,16 +1,12 @@
+export const creating = async () => {
+  return { success: false };
+}
+
 export const uploading = async () => {
   return { success: false };
 }
 
-export const copying = async () => {
-  return { success: false };
-}
-
-export const cutting = async () => {
-  return { success: false };
-}
-
-export const pasting = async () => {
+export const moving = async () => {
   return { success: false };
 }
 

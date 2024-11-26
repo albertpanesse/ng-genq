@@ -1,6 +1,6 @@
 import { assign, emit, fromPromise, setup } from "xstate";
 import { IUser } from "../../models";
-import { signingIn, signingOut } from "../../apis";
+import { signingIn } from "../../apis";
 import { IAuthSigningInResponsePayload, ICommonFunctionResult } from "../../types";
 import { ApiService, CommonUIService, EAlertType, IAlert } from "../";
 import { IRootContext } from ".";
@@ -71,13 +71,12 @@ export const authStateMachine = setup({
         message: context.context.authError.message,
       } as IAlert);
     },
-    successSigningInRedirect: ({ context }) => {
-      context.services.commonUIService.pageRedirect('/');
+    redirectToTop: ({ context }) => {
+      context.services.commonUIService.pageRedirect('');
     },
   },
   actors: {    
     'actorSigningIn': fromPromise(signingIn),
-    'actorSigningOut': fromPromise(signingOut),
   },
   guards: {
     isAuthError: ({ context }) => context.context.isAuthError,
@@ -111,6 +110,9 @@ export const authStateMachine = setup({
                 credential: event.params as TEventAuthSigningInParams,
               } as IStateAuthContext),
             }),
+          },
+          'event.signingOut': {
+            target: 'signingOut',
           }
         }
       },
@@ -154,31 +156,30 @@ export const authStateMachine = setup({
       },
       'signingInError': {        
         entry: [{ type: 'showAuthErrorAlert' }],
+        always: [{ target: 'idle' }],
         exit: [{ type: 'resetError' }],
       },
-      'signingOut': {
-        invoke: {
-          src: 'actorSigningOut',
-          onDone: {
-            target: 'signedOut',
-          },
-          onError: {
-            target: 'signingOutError',
-          }
-        }
-      },
-      'signingOutError': {},
-      'signingOutRetry': {
-        type: 'final',
-      },
       'signedIn': {
-        entry: [{ type: 'successSigningInRedirect' }],
-        on: {
-          'event.signingOut': {
-            target: 'signingOut',
-          }
-        }
+        entry: [{ type: 'redirectToTop' }],
+        always: [{ target: 'idle' }],
       },
-      'signedOut': {},
+      'signingOut': {
+        always: [
+          {
+            target: 'afterSigningOut',
+            actions: [
+              { type: 'resetError' },
+              { type: 'resetAuth' },
+            ],    
+          }
+        ],
+      },
+      'afterSigningOut': {
+        always: [{ target: 'signedOut' }],
+      },
+      'signedOut': {
+        entry: [{ type: 'redirectToTop' }],
+        always: [{ target: 'idle', actions: [() => window.location.reload()] }],
+      },
     }
   });

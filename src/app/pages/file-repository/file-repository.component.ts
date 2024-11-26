@@ -2,6 +2,7 @@ import { Component } from "@angular/core";
 import { FileExplorerModule, EFileType, ITreeItem } from "../../components";
 
 @Component({
+  selector: 'file-repository-comp',
   templateUrl: 'file-repository.component.html',
   styleUrls: ['file-repository.component.scss'],
   standalone: true,

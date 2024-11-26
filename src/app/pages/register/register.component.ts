@@ -3,7 +3,7 @@ import { IconDirective } from '@coreui/icons-angular';
 import { ContainerComponent, RowComponent, ColComponent, TextColorDirective, CardComponent, CardBodyComponent, FormDirective, InputGroupComponent, InputGroupTextDirective, FormControlDirective, ButtonDirective } from '@coreui/angular';
 
 @Component({
-    selector: 'app-register',
+    selector: 'register-comp',
     templateUrl: './register.component.html',
     styleUrls: ['./register.component.scss'],
     standalone: true,

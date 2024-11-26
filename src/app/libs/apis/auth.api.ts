@@ -26,5 +26,3 @@ export const signingIn = async ({ input: { apiService, credential } }: any): Pro
       } as ICommonFunctionResult<IErrorResponsePayload>; 
     });
 };
-
-export const signingOut = async () => {};

@@ -20,6 +20,7 @@ import {
 import { AuthService } from '../../libs/services/auth.service';
 
 @Component({
+  selector: 'sign-in-comp',
     templateUrl: './sign-in.component.html',
     styleUrls: ['./sign-in.component.scss'],
     standalone: true,

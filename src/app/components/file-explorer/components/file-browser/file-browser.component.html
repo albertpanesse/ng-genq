@@ -1,3 +1,9 @@
 <div class="file-browser-wrapper">
-  <div class="file-browser-item" *ngFor="let item of filteredItems; let idx = index">{{ item.fileItem.title }}</div>
+  <div class="file-browser-item-container">
+    <div class="file-browser-item" *ngFor="let item of filteredItems; let idx = index">{{ item.fileItem.title }}</div>
+  </div>
+  <div class="file-browser-actions">
+    <button (click)="handlerOnCreateDir()">Create Dir</button>
+  </div>
+  <create-dir-dialog-comp [visible]="isCreateDirDialogVisible" (closed)="handlerOnCreateDirDialogClosed()" />
 </div>
