@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { Router } from "@angular/router";
 import { BehaviorSubject } from "rxjs";
 
 const DEFAULT_TIMEOUT = 3000;
@@ -33,6 +34,8 @@ export const createAlert = function(type: EAlertType, title: string, message: st
 export class CommonUIService {
   private _alertSubject$: BehaviorSubject<IAlert[]> = new BehaviorSubject([] as IAlert[]);
 
+  constructor(private router: Router) {}
+
   getAlertSubject(): BehaviorSubject<IAlert[]> {
     return this._alertSubject$;
   }
@@ -41,5 +44,9 @@ export class CommonUIService {
     const currentAlerts = this._alertSubject$.getValue() as IAlert[];
     currentAlerts.push(alert);
     this._alertSubject$.next(currentAlerts);
+  }
+
+  pageRedirect(path: string): void {
+    this.router.navigate([path]);
   }
 }

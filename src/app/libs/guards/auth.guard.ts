@@ -1,24 +1,18 @@
-// auth.guard.ts
 import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { lastValueFrom, take } from 'rxjs';
+import { CanActivate, Router } from '@angular/router';
 
-import { IGlobalState } from '../store';
-import { isUserLoggedInSelector } from '../store/selectors';
+import { AuthService } from '../services';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
 
-  constructor(private store: Store<IGlobalState>, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
-  async canActivate(
-    next: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Promise<boolean> {
+  async canActivate(): Promise<boolean> {
     
-    const isUserLoggedIn = await lastValueFrom(this.store.select(isUserLoggedInSelector).pipe(take(1)));
+    const isUserLoggedIn = this.authService.isLoggedIn();
     if (isUserLoggedIn) {
       return true;
     } else {

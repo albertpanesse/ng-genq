@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
-import { createActor } from 'xstate';
+import { createActor, Snapshot } from 'xstate';
 import { Observable } from 'rxjs';
 
-import { authStateMachine } from './state-machines/auth.machine';
-import { CommonUIService, createAlert, EAlertType } from './common-ui.service';
+import { authStateMachine, IStateAuthContext } from './state-machines';
+import { ApiService, CommonUIService } from './';
+import { IAuthCredential } from '../types';
+import { IUser } from '../models';
 
 @Injectable({
   providedIn: 'root'
@@ -11,21 +13,38 @@ import { CommonUIService, createAlert, EAlertType } from './common-ui.service';
 export class AuthService {
   private authActor: any;
 
-  constructor(private commonUIService: CommonUIService) {
-    this.authActor = createActor(authStateMachine).start();
+  constructor(private apiService: ApiService, private commonUIService: CommonUIService) {
+    const authMachineContext: IStateAuthContext = JSON.parse(localStorage.getItem('authMachineContext') as string);
+    this.authActor = createActor(authStateMachine, {
+      input: {
+        services: {
+          apiService: this.apiService,
+          commonUIService: this.commonUIService,  
+        },
+        context: { ...authMachineContext },
+      },
+    }).start();
 
     this.authActor.subscribe((snapshot: any) => {
       console.log('snapshot', snapshot);
-      if (snapshot.value === 'signingInError') {
-        this.commonUIService.setAlert(createAlert(EAlertType.AT_ERROR, 'ERror', 'ERROR!!!!!!!!!!'));
-      }
-    })
+      localStorage.setItem('authMachineContext', JSON.stringify(snapshot.context.context));
+    });
   }
 
   get state$(): Observable<any> {
     return new Observable(observer => {
       this.authActor.subscribe((state: any) => observer.next(state));
     });
+  }
+
+  isLoggedIn(): boolean {
+    const snapshot = this.authActor.getSnapshot();
+    return snapshot.context.context.isSignedIn;
+  }
+
+  getCurrentLoggedInUser(): IUser {
+    const snapshot = this.authActor.getSnapshot();
+    return snapshot.context.context.user;
   }
 
   signIn(authCredential: IAuthCredential) {
@@ -35,9 +54,4 @@ export class AuthService {
   signOut() {
     this.authActor.send({ type: 'event.signingOut' });
   }
-}
-
-export interface IAuthCredential {
-  username: string;
-  password: string;
 }

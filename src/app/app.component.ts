@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
@@ -9,7 +9,7 @@ import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from './icons/icon-subset';
 import { AlertComponent } from "./components/alert/alert.component";
 import { CommonUIService, IAlert } from "./libs/services";
-import { Subject } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-root',
@@ -29,12 +29,16 @@ export class AppComponent implements OnInit {
   readonly #colorModeService = inject(ColorModeService);
   readonly #iconSetService = inject(IconSetService);
 
-  constructor(private commonUIService: CommonUIService) {
+  constructor(private commonUIService: CommonUIService, private translate: TranslateService) {
     this.#titleService.setTitle(this.title);
     // iconSet singleton
     this.#iconSetService.icons = { ...iconSubset };
     this.#colorModeService.localStorageItemName.set('coreui-free-angular-admin-template-theme-default');
     this.#colorModeService.eventName.set('ColorSchemeChange');
+
+    this.translate.addLangs(['en', 'id', 'ar', 'fr']);
+    this.translate.setDefaultLang('en');
+    this.translate.use('en');
   }
 
   ngOnInit(): void {

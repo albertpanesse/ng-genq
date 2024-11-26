@@ -1,14 +1,23 @@
-import { assign, fromPromise, setup } from "xstate";
+import { assign, emit, fromPromise, setup } from "xstate";
 import { IUser } from "../../models";
 import { signingIn, signingOut } from "../../apis";
 import { IAuthSigningInResponsePayload, ICommonFunctionResult } from "../../types";
+import { ApiService, CommonUIService, EAlertType, IAlert } from "../";
+import { IRootContext } from ".";
+
+export interface IStateAuthServices {
+  apiService: ApiService;
+  commonUIService: CommonUIService;
+}
 
 export interface IStateAuthContext {
   isSignedIn: boolean;
-  user: IUser | null;
+  user: IUser;
   accessToken: string;
   refreshToken: string;
   credential: TEventAuthSigningInParams;
+  isAuthError: boolean;
+  authError: TEventAuthSigningInErrorParams;
 };
 
 interface IStateAuthEvent<T1, T2 = void> {
@@ -21,65 +30,135 @@ type TEventAuthSigningInParams = {
   password: string;
 }
 
+type TEventAuthSigningInErrorParams = {
+  message: string;
+  path: string;
+  statusCode: number;
+  timestamp: string;
+}
+
 export const authStateMachine = setup({
   types: {
-    context: {} as IStateAuthContext,
-    events: {} as IStateAuthEvent<'event.signingIn', TEventAuthSigningInParams> | IStateAuthEvent<'event.signingOut'>,
+    context: {} as IRootContext<IStateAuthServices, IStateAuthContext>,
+    events: {} as IStateAuthEvent<'event.signingIn', TEventAuthSigningInParams> | 
+      IStateAuthEvent<'event.signingInError', TEventAuthSigningInErrorParams> |
+      IStateAuthEvent<'event.signingOut'>,
   },
-  actors: {
-    'actor.signingIn': fromPromise(signingIn),
-    'actor.signingOut': fromPromise(signingOut),
+  actions: {
+    resetAuth: assign({
+      context: {
+        isSignedIn: false,
+        user: {} as IUser,
+        accessToken: '',
+        refreshToken: '',
+      } as IStateAuthContext,
+    }),
+    resetError: assign({
+      context: {
+        isAuthError: false,
+        authError: {} as TEventAuthSigningInErrorParams,
+      } as IStateAuthContext,
+    }),
+    resetCredential: assign({
+      context: {
+        credential: {} as TEventAuthSigningInParams,
+      } as IStateAuthContext,
+    }),
+    showAuthErrorAlert: ({ context }) => {
+      context.services.commonUIService.setAlert({
+        type: EAlertType.AT_ERROR,
+        title: 'Authentication Error',
+        message: context.context.authError.message,
+      } as IAlert);
+    },
+    successSigningInRedirect: ({ context }) => {
+      context.services.commonUIService.pageRedirect('/');
+    },
+  },
+  actors: {    
+    'actorSigningIn': fromPromise(signingIn),
+    'actorSigningOut': fromPromise(signingOut),
+  },
+  guards: {
+    isAuthError: ({ context }) => context.context.isAuthError,
   },
 })
   .createMachine({
     id: 'authStateMachine',
-    context: {
-      isSignedIn: false,
-      user: null,
-      accessToken: '',
-      refreshToken: '',
-      credential: {} as TEventAuthSigningInParams,
-    },
-    initial: 'signedOut',
+    context: ({ input }: any) => ({
+      services: {
+        apiService: input.services.apiService,
+        commonUIService: input.services.commonUIService,
+      },
+      context: {
+        isSignedIn: input.context.isSignedIn || false,
+        user: input.context.user || {} as IUser,
+        accessToken: input.context.accessToken || '',
+        refreshToken: input.context.refreshToken || '',
+        credential: input.context.credential || {} as TEventAuthSigningInParams,
+        isAuthError: input.context.isAuthError || false,
+        authError: input.context.authError || {} as TEventAuthSigningInErrorParams,
+      },
+    }),
+    initial: 'idle',
     states: {
-      'signedOut': {
+      'idle': {
         on: {
           'event.signingIn': {
             target: 'signingIn',
             actions: assign({
-              credential: ({ event }) => event.params as TEventAuthSigningInParams,
+              context: ({ event }) => ({
+                credential: event.params as TEventAuthSigningInParams,
+              } as IStateAuthContext),
             }),
           }
         }
       },
       'signingIn': {
         invoke: {
-          src: 'actor.signingIn',
-          input: ({ context: { credential } }) => ({ credential }),
+          src: 'actorSigningIn',
+          input: ({ context: { services: { apiService }, context: { credential } } }) => ({ apiService, credential }),
           onDone: {
-            target: 'signedIn',
-            actions: [({ context, event }) => {
-              if (event.output && event.output.success) {
-                const payload = event.output as ICommonFunctionResult<IAuthSigningInResponsePayload>;
-                context = {
-                  ...context,
-                  ...payload,
-                };
-              }
-            }],
+            target: 'afterSigningIn',
+            actions: [
+              { type: 'resetCredential' },
+              { type: 'resetAuth' },
+              { type: 'resetError' },
+              ({ context, event }) => {
+                const authApiResponse = event.output;
+                context.context.credential = {} as TEventAuthSigningInParams;
+                if (authApiResponse?.success) {
+                  const { accessToken, refreshToken } = (authApiResponse as ICommonFunctionResult<IAuthSigningInResponsePayload>).functionResult;
+                  context.context.isSignedIn = true;
+                  context.context.accessToken = accessToken;
+                  context.context.refreshToken = refreshToken;
+                } else {
+                  context.context.isAuthError = true;
+                  context.context.authError = (authApiResponse as ICommonFunctionResult<TEventAuthSigningInErrorParams>).functionResult;
+                }
+              },
+            ],
           },
-          onError: {
-            target: 'signingInError',
-          }
-        }
+        },
       },
-      'signingInError': {},
-      'signingInRetry': {
-        type: 'final',
+      'afterSigningIn': {
+        always: [
+          {
+            guard: 'isAuthError',
+            target: 'signingInError',
+          },
+          {
+            target: 'signedIn',
+          },
+        ],
+      },
+      'signingInError': {        
+        entry: [{ type: 'showAuthErrorAlert' }],
+        exit: [{ type: 'resetError' }],
       },
       'signingOut': {
         invoke: {
-          src: 'actor.signingOut',
+          src: 'actorSigningOut',
           onDone: {
             target: 'signedOut',
           },
@@ -93,11 +172,13 @@ export const authStateMachine = setup({
         type: 'final',
       },
       'signedIn': {
+        entry: [{ type: 'successSigningInRedirect' }],
         on: {
           'event.signingOut': {
             target: 'signingOut',
           }
         }
-      }
+      },
+      'signedOut': {},
     }
   });

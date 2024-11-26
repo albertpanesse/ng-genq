@@ -1,3 +1,1 @@
-export const showAlert = function() {
-  
-}
+export * from "./error-interceptor.helper";

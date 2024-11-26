@@ -2,10 +2,8 @@ export const SetIsUserLoggedInAction = 'SetIsUserLoggedInAction';
 export const ResetUserAction = 'ResetUserAction';
 
 export interface IApiResponse {
-  message: string;
-  path: string;
-  statusCode: number;
-  timestamp: string;
+  success: boolean;
+  payload: any;
 }
 
 export interface IAuthSigningInResponsePayload {
@@ -20,9 +18,21 @@ export interface IErrorObject {
   message: string;
 }
 
+export interface IErrorResponsePayload {
+  message: string;
+  path: string;
+  statusCode: number;
+  timestamp: string;
+}
+
 export interface ICommonFunctionResult<T> {
   success: boolean;
-  payload: T;
+  functionResult: T;
+}
+
+export interface IAuthCredential {
+  username: string;
+  password: string;
 }
 
 export enum EError {
