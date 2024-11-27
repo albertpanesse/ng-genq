@@ -1,51 +1,51 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { CommonService } from ".";
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApiService {
-  #headers: HttpHeaders = new HttpHeaders();
+  #headers: { [key: string]: string } = {};
 
-  constructor(private http: HttpClient) {
-    this.#headers.set('Content-Type', 'application/json');
+  constructor(private http: HttpClient, private commonService: CommonService) {
+    this.#headers['Content-Type'] = 'application/json';
   }
 
   #mergeHeaders(isNeedAuthorization: boolean, headers?: { [key: string]: string }) {
-    if (!headers) return this.#headers;
+    const { accessToken } = this.commonService.getTokens();
 
     if (isNeedAuthorization) {
-      this.#headers.set('Authorization', 'Bearer 1231234123123');
+      this.#headers['Authorization'] = `Bearer ${accessToken}`;
     }
 
-    for (const key in headers) {
-      if (headers.hasOwnProperty(key)) {
-        const value = headers[key];
-        this.#headers.set(key, value);
-      }
-    }
+    this.#headers = { ...this.#headers, ...headers };
 
     return this.#headers;
   }
 
   // Generic GET request
-  get<T>(url: string, params?: HttpParams, headers?: { [key: string]: string }, isNeedAuthorization: boolean = false): Observable<T> {
-    return this.http.get<T>(url, { params, headers: this.#mergeHeaders(isNeedAuthorization, headers) });
+  get<T>(url: string, params?: HttpParams, additionalHeaders?: { [key: string]: string }, isNeedAuthorization: boolean = false): Observable<T> {
+    const headers = this.#mergeHeaders(isNeedAuthorization, additionalHeaders);
+    return this.http.get<T>(url, { params, headers });
   }
 
   // Generic POST request
-  post<T>(url: string, body: any, headers?: { [key: string]: string }, isNeedAuthorization: boolean = false): Observable<T> {
-    return this.http.post<T>(url, body, { headers: this.#mergeHeaders(isNeedAuthorization, headers) });
+  post<T>(url: string, body: any, additionalHeaders?: { [key: string]: string }, isNeedAuthorization: boolean = false): Observable<T> {
+    const headers = this.#mergeHeaders(isNeedAuthorization, additionalHeaders);
+    return this.http.post<T>(url, body, { headers });
   }
 
   // Generic PUT request
-  put<T>(url: string, body: any, headers?: { [key: string]: string }, isNeedAuthorization: boolean = false): Observable<T> {
-    return this.http.put<T>(url, body, { headers: this.#mergeHeaders(isNeedAuthorization, headers) });
+  put<T>(url: string, body: any, additionalHeaders?: { [key: string]: string }, isNeedAuthorization: boolean = false): Observable<T> {
+    const headers = this.#mergeHeaders(isNeedAuthorization, additionalHeaders);
+    return this.http.put<T>(url, body, { headers });
   }
 
   // Generic DELETE request
-  delete<T>(url: string, headers?: { [key: string]: string }, isNeedAuthorization: boolean = false): Observable<T> {
-    return this.http.delete<T>(url, { headers: this.#mergeHeaders(isNeedAuthorization, headers) });
+  delete<T>(url: string, additionalHeaders?: { [key: string]: string }, isNeedAuthorization: boolean = false): Observable<T> {
+    const headers = this.#mergeHeaders(isNeedAuthorization, additionalHeaders);
+    return this.http.delete<T>(url, { headers });
   }
 }

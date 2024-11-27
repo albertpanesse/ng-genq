@@ -8,7 +8,7 @@ import { ColorModeService } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from './icons/icon-subset';
 import { AlertComponent } from "./components/alert/alert.component";
-import { CommonUIService, IAlert } from "./libs/services";
+import { CommonService, IAlert } from "./libs/services";
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -29,7 +29,7 @@ export class AppComponent implements OnInit {
   readonly #colorModeService = inject(ColorModeService);
   readonly #iconSetService = inject(IconSetService);
 
-  constructor(private commonUIService: CommonUIService, private translate: TranslateService) {
+  constructor(private commonService: CommonService, private translate: TranslateService) {
     this.#titleService.setTitle(this.title);
     // iconSet singleton
     this.#iconSetService.icons = { ...iconSubset };
@@ -42,7 +42,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.commonUIService.getAlertSubject()
+    this.commonService.getAlertSubject()
       .pipe(takeUntilDestroyed(this.#destroyRef))
       .subscribe((alerts: IAlert[]) => {
         if (alerts && alerts.length > 0) {

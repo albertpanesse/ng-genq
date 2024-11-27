@@ -1,15 +1,20 @@
 import { assign, fromPromise, setup } from "xstate";
-import { ICommonFunctionResult, IFileManagerUploadingResponsePayload } from "../../types";
-import { creating, deleting, moving, uploading } from "../../apis";
-import { ApiService, CommonUIService } from "../";
+import { ICommonFunctionResult, IErrorResponsePayload, IUserFile, TFileManagerListingResponsePayload } from "../../types";
+import { creating, deleting, listing, moving, uploading } from "../apis";
+import { ApiService, CommonService, EAlertType, IAlert } from "../";
 import { IRootContext } from ".";
 
 export interface IStateFileManagerServices {
   apiService: ApiService;
-  commonUIService: CommonUIService;
+  commonService: CommonService;
 }
 
-export interface IStateFileManagerContext {};
+export interface IStateFileManagerContext {
+  fileDirList: IUserFile[];
+  dirName: string;
+  isError: boolean;
+  errorDetails: any;
+};
 
 interface IStateFileManagerEvent<T1, T2 = void> {
   type: T1;
@@ -18,7 +23,9 @@ interface IStateFileManagerEvent<T1, T2 = void> {
 
 interface TEventFileManagerUploadingParams {}
 
-interface TEventFileManagerCreatingParams {}
+interface TEventFileManagerCreatingParams {
+  dirName: string;
+}
 
 interface TEventFileManagerMovingParams {}
 
@@ -27,138 +34,113 @@ interface TEventFileManagerDeletingParams {}
 export const fileManagerStateMachine = setup({
   types: {
     context: {} as IRootContext<IStateFileManagerServices, IStateFileManagerContext>,
-    events: {} as IStateFileManagerEvent<'event.uploading', TEventFileManagerUploadingParams> | 
+    events: {} as IStateFileManagerEvent<'event.listing'> | 
+      IStateFileManagerEvent<'event.uploading', TEventFileManagerUploadingParams> | 
       IStateFileManagerEvent<'event.creating', TEventFileManagerCreatingParams> | 
       IStateFileManagerEvent<'event.moving', TEventFileManagerMovingParams> | 
       IStateFileManagerEvent<'event.deleting', TEventFileManagerDeletingParams>,
   },
+  actions: {
+    resetError: assign({
+      context: {
+        isError: false,
+        errorDetails: null,
+      } as IStateFileManagerContext,
+    }),
+    showAlert: ({ context }) => {
+      context.services.commonService.setAlert({
+        type: EAlertType.AT_ERROR,
+        title: 'Error',
+        message: context.context.errorDetails.message,
+      } as IAlert);
+    },
+  },
   actors: {
-    'actor.uploading': fromPromise(uploading),
-    'actor.creating': fromPromise(creating),
-    'actor.moving': fromPromise(moving),
-    'actor.deleting': fromPromise(deleting),
+    'actorListing': fromPromise(listing),
+    'actorUploading': fromPromise(uploading),
+    'actorCreating': fromPromise(creating),
+    'actorMoving': fromPromise(moving),
+    'actorDeleting': fromPromise(deleting),
+  },
+  guards: {
+    isError: ({ context }) => context.context.isError,
   },
 })
   .createMachine({
     id: 'fileManagerStateMachine',
-    context: {},
+    context: ({ input }: any) => ({
+      services: {
+        apiService: input.services.apiService,
+        commonService: input.services.commonService,
+      },
+      context: {
+        fileDirList: [],
+        dirName: '',
+        isError: false,
+        errorDetails: null,
+      },
+    }),
     initial: 'idle',
     states: {
       'idle': {
         on: {
-          'event.uploading': {
-            target: 'uploading',
-            actions: assign({
-              credential: ({ event }) => event.params as TEventFileManagerUploadingParams,
-            }),
+          'event.listing': {
+            target: 'listing',
           },
           'event.creating': {
             target: 'creating',
             actions: assign({
-              credential: ({ event }) => event.params as TEventFileManagerCreatingParams,
-            }),
-          },
-          'event.moving': {
-            target: 'moving',
-            actions: assign({
-              credential: ({ event }) => event.params as TEventFileManagerMovingParams,
-            }),
-          },
-          'event.deleting': {
-            target: 'deleting',
-            actions: assign({
-              credential: ({ event }) => event.params as TEventFileManagerDeletingParams,
+              context: ({ event }) => ({
+                dirName: event.params?.dirName,
+              } as IStateFileManagerContext),
             }),
           },
         }
       },
-      'uploading': {
+      'listing': {
         invoke: {
-          src: 'actor.uploading',
-          input: {},
+          src: 'actorListing',
+          input: ({ context: { services: { apiService } } }) => ({ apiService }),
           onDone: {
-            target: 'uploaded',
-            actions: [({ context, event }) => {
-              if (event.output && event.output.success) {
-                const payload = event.output as ICommonFunctionResult<IFileManagerUploadingResponsePayload>;
-                context = {
-                  ...context,
-                  ...payload,
-                };
-              }
-            }],
+            target: 'afterListing',
+            actions: [
+              { type: 'resetError' },
+              ({ context, event }) => {
+                const apiResponse = event.output;
+                context.context.fileDirList = [];
+                if (apiResponse?.success) {
+                  context.context.fileDirList = (apiResponse as ICommonFunctionResult<TFileManagerListingResponsePayload>).functionResult;
+                } else {
+                  context.context.isError = true;
+                  context.context.errorDetails = (apiResponse as ICommonFunctionResult<IErrorResponsePayload>).functionResult;
+                }
+              },
+            ],
           },
-          onError: {
-            target: 'uploadingError',
-          }
-        }
+        },
       },
-      'uploaded': {
-        target: 'idle',
-      },
-      'uploadingError': {},
-      'uploadingRetry': {
-        type: 'final',
-      },
-      'copying': {
-        invoke: {
-          src: 'actor.copying',
-          onDone: {
-            target: 'copied',
+      'afterListing': {
+        always: [
+          {
+            guard: 'isError',
+            target: 'listingError',
           },
-          onError: {
-            target: 'copyingError',
-          }
-        }
-      },
-      'copied': {},
-      'copyingError': {},
-      'copyingRetry': {},
-      'cutting': {
-        invoke: {
-          src: 'actor.cutting',
-          onDone: {
-            target: 'cut',
+          {
+            target: 'listingSuccess',
           },
-          onError: {
-            target: 'cuttingError',
-          }
-        }
+        ],
       },
-      'cut': {},
-      'cuttingError': {},
-      'cuttingRetry': {},
-      'pasting': {
-        invoke: {
-          src: 'actor.pasting',
-          onDone: {
-            target: 'paste',
-          },
-          onError: {
-            target: 'pastingError',
-          }
-        }
+      'listingError': {
+        entry: [{ type: 'showAlert' }],
+        always: [{ target: 'idle' }],
+        exit: [{ type: 'resetError' }],
       },
-      'paste': {},
-      'pastingError': {},
-      'pastingRetry': {},
-      'deleting': {
-        invoke: {
-          src: 'actor.deleting',
-          onDone: {
-            target: 'deleted',
-          },
-          onError: {
-            target: 'deletingError',
-          }
-        }
+      'listingSuccess': {
+        entry: [({ event }) => {
+          console.log('event', event);
+        }],
+        always: [{ target: 'idle' }],
       },
-      'deleted': {
-        target: 'idle',
-      },
-      'deletingError': {},
-      'deletingRetry': {
-        type: 'final',
-      },
+      'creating': {},
     }
   });

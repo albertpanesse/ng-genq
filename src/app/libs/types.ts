@@ -1,6 +1,3 @@
-export const SetIsUserLoggedInAction = 'SetIsUserLoggedInAction';
-export const ResetUserAction = 'ResetUserAction';
-
 export interface IApiResponse {
   success: boolean;
   payload: any;
@@ -11,7 +8,19 @@ export interface IAuthSigningInResponsePayload {
   refreshToken: string;
 }
 
-export interface IFileManagerUploadingResponsePayload {}
+export interface IUserFile {
+  id: number;
+  userId: number;
+  title: string;
+  isDir: boolean;
+  isOnRoot: boolean;
+  parentId: number;
+  fileName: string;
+}
+
+export type TFileManagerListingResponsePayload = IUserFile[];
+
+export interface IFileManagerCreatingResponsePayload {}
 
 export interface IErrorObject {
   code: EError;

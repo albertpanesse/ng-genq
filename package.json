@@ -38,6 +38,7 @@
     "@coreui/icons": "^3.0.1",
     "@coreui/icons-angular": "5.2",
     "@coreui/utils": "^2.0.2",
+    "@ngrx/store": "^18.1.1",
     "@ngx-translate/core": "^16.0.3",
     "@ngx-translate/http-loader": "^16.0.0",
     "chart.js": "^4.4.6",

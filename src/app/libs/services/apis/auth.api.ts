@@ -1,5 +1,5 @@
-import { IApiResponse, IAuthSigningInResponsePayload, ICommonFunctionResult, IErrorResponsePayload } from "../types";
-import { AUTH_URL } from '../consts';
+import { IApiResponse, IAuthSigningInResponsePayload, ICommonFunctionResult, IErrorResponsePayload } from "../../types";
+import { AUTH_URL } from '../../consts';
 import { HttpErrorResponse } from "@angular/common/http";
 
 export const signingIn = async ({ input: { apiService, credential } }: any): Promise<ICommonFunctionResult<IAuthSigningInResponsePayload> | ICommonFunctionResult<IErrorResponsePayload>> => {

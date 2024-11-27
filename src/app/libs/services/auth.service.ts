@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
-import { createActor, Snapshot } from 'xstate';
+import { createActor } from 'xstate';
 import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
 
 import { authStateMachine, IStateAuthContext } from './state-machines';
-import { ApiService, CommonUIService } from './';
+import { ApiService, CommonService } from './';
 import { IAuthCredential } from '../types';
 import { IUser } from '../models';
+import { IGlobalState } from './store';
 
 @Injectable({
   providedIn: 'root'
@@ -13,13 +15,14 @@ import { IUser } from '../models';
 export class AuthService {
   private authActor: any;
 
-  constructor(private apiService: ApiService, private commonUIService: CommonUIService) {
+  constructor(private store: Store<IGlobalState>, private apiService: ApiService, private commonService: CommonService) {
     const authMachineContext: IStateAuthContext = JSON.parse(localStorage.getItem('authMachineContext') as string);
     this.authActor = createActor(authStateMachine, {
       input: {
         services: {
           apiService: this.apiService,
-          commonUIService: this.commonUIService,  
+          commonService: this.commonService,  
+          store: this.store,
         },
         context: { ...authMachineContext },
       },

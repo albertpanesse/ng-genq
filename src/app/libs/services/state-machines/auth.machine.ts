@@ -1,13 +1,17 @@
-import { assign, emit, fromPromise, setup } from "xstate";
+import { assign, fromPromise, setup } from "xstate";
+import { Store } from "@ngrx/store";
+
 import { IUser } from "../../models";
-import { signingIn } from "../../apis";
-import { IAuthSigningInResponsePayload, ICommonFunctionResult } from "../../types";
-import { ApiService, CommonUIService, EAlertType, IAlert } from "../";
+import { signingIn } from "../apis";
+import { IAuthSigningInResponsePayload, ICommonFunctionResult, IErrorResponsePayload } from "../../types";
+import { ApiService, CommonService, EAlertType, IAlert } from "../";
 import { IRootContext } from ".";
+import { IGlobalState } from "../store";
 
 export interface IStateAuthServices {
   apiService: ApiService;
-  commonUIService: CommonUIService;
+  commonService: CommonService;
+  store: Store<IGlobalState>;
 }
 
 export interface IStateAuthContext {
@@ -17,7 +21,7 @@ export interface IStateAuthContext {
   refreshToken: string;
   credential: TEventAuthSigningInParams;
   isAuthError: boolean;
-  authError: TEventAuthSigningInErrorParams;
+  authError: IErrorResponsePayload;
 };
 
 interface IStateAuthEvent<T1, T2 = void> {
@@ -30,18 +34,11 @@ type TEventAuthSigningInParams = {
   password: string;
 }
 
-type TEventAuthSigningInErrorParams = {
-  message: string;
-  path: string;
-  statusCode: number;
-  timestamp: string;
-}
-
 export const authStateMachine = setup({
   types: {
     context: {} as IRootContext<IStateAuthServices, IStateAuthContext>,
     events: {} as IStateAuthEvent<'event.signingIn', TEventAuthSigningInParams> | 
-      IStateAuthEvent<'event.signingInError', TEventAuthSigningInErrorParams> |
+      IStateAuthEvent<'event.signingInError', IErrorResponsePayload> |
       IStateAuthEvent<'event.signingOut'>,
   },
   actions: {
@@ -56,7 +53,7 @@ export const authStateMachine = setup({
     resetError: assign({
       context: {
         isAuthError: false,
-        authError: {} as TEventAuthSigningInErrorParams,
+        authError: {} as IErrorResponsePayload,
       } as IStateAuthContext,
     }),
     resetCredential: assign({
@@ -65,14 +62,14 @@ export const authStateMachine = setup({
       } as IStateAuthContext,
     }),
     showAuthErrorAlert: ({ context }) => {
-      context.services.commonUIService.setAlert({
+      context.services.commonService.setAlert({
         type: EAlertType.AT_ERROR,
         title: 'Authentication Error',
         message: context.context.authError.message,
       } as IAlert);
     },
     redirectToTop: ({ context }) => {
-      context.services.commonUIService.pageRedirect('');
+      context.services.commonService.pageRedirect('');
     },
   },
   actors: {    
@@ -87,16 +84,17 @@ export const authStateMachine = setup({
     context: ({ input }: any) => ({
       services: {
         apiService: input.services.apiService,
-        commonUIService: input.services.commonUIService,
+        commonService: input.services.commonService,
+        store: input.services.store,
       },
       context: {
         isSignedIn: input.context.isSignedIn || false,
         user: input.context.user || {} as IUser,
         accessToken: input.context.accessToken || '',
         refreshToken: input.context.refreshToken || '',
-        credential: input.context.credential || {} as TEventAuthSigningInParams,
-        isAuthError: input.context.isAuthError || false,
-        authError: input.context.authError || {} as TEventAuthSigningInErrorParams,
+        credential: {} as TEventAuthSigningInParams,
+        isAuthError: false,
+        authError: {} as IErrorResponsePayload,
       },
     }),
     initial: 'idle',
@@ -136,7 +134,7 @@ export const authStateMachine = setup({
                   context.context.refreshToken = refreshToken;
                 } else {
                   context.context.isAuthError = true;
-                  context.context.authError = (authApiResponse as ICommonFunctionResult<TEventAuthSigningInErrorParams>).functionResult;
+                  context.context.authError = (authApiResponse as ICommonFunctionResult<IErrorResponsePayload>).functionResult;
                 }
               },
             ],

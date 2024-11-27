@@ -31,7 +31,7 @@ export const createAlert = function(type: EAlertType, title: string, message: st
 @Injectable({
   providedIn: 'root',
 })
-export class CommonUIService {
+export class CommonService {
   private _alertSubject$: BehaviorSubject<IAlert[]> = new BehaviorSubject([] as IAlert[]);
 
   constructor(private router: Router) {}
@@ -44,6 +44,13 @@ export class CommonUIService {
     const currentAlerts = this._alertSubject$.getValue() as IAlert[];
     currentAlerts.push(alert);
     this._alertSubject$.next(currentAlerts);
+  }
+
+  getTokens(): { accessToken: string; refreshToken: string } {
+    return {
+      accessToken: '',
+      refreshToken: '',
+    };
   }
 
   pageRedirect(path: string): void {
