@@ -4,6 +4,8 @@ import { fileManagerStateMachine, IStateFileManagerContext } from "./state-machi
 import { createActor } from "xstate";
 import { Subject } from "rxjs";
 import { IUserFile } from "../types";
+import { IGlobalState } from "./store";
+import { Store } from "@ngrx/store";
 
 @Injectable({
   providedIn: 'root',
@@ -12,29 +14,27 @@ export class FileManagerService {
   private fileManagerActor: any;
   private fileDirListObs$: Subject<IUserFile[]> = new Subject();
 
-  constructor(private apiService: ApiService, private commonService: CommonService) {
-    const fileManagerMachineContext: IStateFileManagerContext = JSON.parse(localStorage.getItem('authMachineContext') as string);
+  constructor(private store: Store<IGlobalState>, private apiService: ApiService, private commonService: CommonService) {
     this.fileManagerActor = createActor(fileManagerStateMachine, {
       input: {
         services: {
           apiService: this.apiService,
-          commonService: this.commonService,  
+          commonService: this.commonService,
+          store: this.store,
         },
-        context: { ...fileManagerMachineContext },
       },
     }).start();
 
     this.fileManagerActor.subscribe((snapshot: any) => {
       console.log('snapshot', snapshot);
-      localStorage.setItem('authMachineContext', JSON.stringify(snapshot.context.context));
     });
   }
 
   getList() {
-    this.fileManagerActor.send({ type: 'event.listing' });
+    this.fileManagerActor.send({ type: 'event_listing' });
   }
 
   create(dirName: string) {
-    this.fileManagerActor.send({ type: 'event.creating', params: { dirName } });
+    this.fileManagerActor.send({ type: 'event_creating', params: { dirName } });
   }
 }
