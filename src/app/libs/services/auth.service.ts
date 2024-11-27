@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
 import { authStateMachine, IStateAuthContext } from './state-machines';
-import { ApiService, CommonService } from './';
+import { ApiService, CommonService } from '.';
 import { IAuthCredential } from '../types';
 import { IUser } from '../models';
 import { IGlobalState } from './store';
@@ -16,7 +16,6 @@ export class AuthService {
   private authActor: any;
 
   constructor(private store: Store<IGlobalState>, private apiService: ApiService, private commonService: CommonService) {
-    const authMachineContext: IStateAuthContext = JSON.parse(localStorage.getItem('authMachineContext') as string);
     this.authActor = createActor(authStateMachine, {
       input: {
         services: {
@@ -24,13 +23,11 @@ export class AuthService {
           commonService: this.commonService,  
           store: this.store,
         },
-        context: { ...authMachineContext },
       },
     }).start();
 
     this.authActor.subscribe((snapshot: any) => {
       console.log('snapshot', snapshot);
-      localStorage.setItem('authMachineContext', JSON.stringify(snapshot.context.context));
     });
   }
 
@@ -51,10 +48,10 @@ export class AuthService {
   }
 
   signIn(authCredential: IAuthCredential) {
-    this.authActor.send({ type: 'event.signingIn', params: authCredential });
+    this.authActor.send({ type: 'event_signingIn', params: authCredential });
   }
 
   signOut() {
-    this.authActor.send({ type: 'event.signingOut' });
+    this.authActor.send({ type: 'event_signingOut' });
   }
 }

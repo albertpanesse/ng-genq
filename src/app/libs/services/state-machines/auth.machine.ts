@@ -7,6 +7,7 @@ import { IAuthSigningInResponsePayload, ICommonFunctionResult, IErrorResponsePay
 import { ApiService, CommonService, EAlertType, IAlert } from "../";
 import { IRootContext } from ".";
 import { IGlobalState } from "../store";
+import { SetLoggedInAction, SetLoggedOutAction } from "../store/actions";
 
 export interface IStateAuthServices {
   apiService: ApiService;
@@ -15,10 +16,6 @@ export interface IStateAuthServices {
 }
 
 export interface IStateAuthContext {
-  isSignedIn: boolean;
-  user: IUser;
-  accessToken: string;
-  refreshToken: string;
   credential: TEventAuthSigningInParams;
   isAuthError: boolean;
   authError: IErrorResponsePayload;
@@ -37,46 +34,33 @@ type TEventAuthSigningInParams = {
 export const authStateMachine = setup({
   types: {
     context: {} as IRootContext<IStateAuthServices, IStateAuthContext>,
-    events: {} as IStateAuthEvent<'event.signingIn', TEventAuthSigningInParams> | 
-      IStateAuthEvent<'event.signingInError', IErrorResponsePayload> |
-      IStateAuthEvent<'event.signingOut'>,
+    events: {} as IStateAuthEvent<'event_signingIn', TEventAuthSigningInParams> | IStateAuthEvent<'event_signingOut'>,
   },
   actions: {
-    resetAuth: assign({
-      context: {
-        isSignedIn: false,
-        user: {} as IUser,
-        accessToken: '',
-        refreshToken: '',
-      } as IStateAuthContext,
-    }),
-    resetError: assign({
+    action_resetError: assign({
       context: {
         isAuthError: false,
         authError: {} as IErrorResponsePayload,
       } as IStateAuthContext,
     }),
-    resetCredential: assign({
+    action_resetCredential: assign({
       context: {
         credential: {} as TEventAuthSigningInParams,
       } as IStateAuthContext,
     }),
-    showAuthErrorAlert: ({ context }) => {
+    action_showAuthErrorAlert: ({ context }) => {
       context.services.commonService.setAlert({
         type: EAlertType.AT_ERROR,
         title: 'Authentication Error',
         message: context.context.authError.message,
       } as IAlert);
     },
-    redirectToTop: ({ context }) => {
-      context.services.commonService.pageRedirect('');
-    },
   },
   actors: {    
-    'actorSigningIn': fromPromise(signingIn),
+    actor_signingIn: fromPromise(signingIn),
   },
   guards: {
-    isAuthError: ({ context }) => context.context.isAuthError,
+    guard_isAuthError: ({ context }) => context.context.isAuthError,
   },
 })
   .createMachine({
@@ -88,50 +72,42 @@ export const authStateMachine = setup({
         store: input.services.store,
       },
       context: {
-        isSignedIn: input.context.isSignedIn || false,
-        user: input.context.user || {} as IUser,
-        accessToken: input.context.accessToken || '',
-        refreshToken: input.context.refreshToken || '',
         credential: {} as TEventAuthSigningInParams,
         isAuthError: false,
         authError: {} as IErrorResponsePayload,
       },
     }),
-    initial: 'idle',
+    initial: 'state_idle',
     states: {
-      'idle': {
+      state_idle: {
         on: {
-          'event.signingIn': {
-            target: 'signingIn',
+          event_signingIn: {
+            target: 'state_signingIn',
             actions: assign({
               context: ({ event }) => ({
                 credential: event.params as TEventAuthSigningInParams,
               } as IStateAuthContext),
             }),
           },
-          'event.signingOut': {
-            target: 'signingOut',
+          event_signingOut: {
+            target: 'state_signingOut',
           }
         }
       },
-      'signingIn': {
+      state_signingIn: {
         invoke: {
-          src: 'actorSigningIn',
+          src: 'actor_signingIn',
           input: ({ context: { services: { apiService }, context: { credential } } }) => ({ apiService, credential }),
           onDone: {
-            target: 'afterSigningIn',
+            target: 'state_afterSigningIn',
             actions: [
-              { type: 'resetCredential' },
-              { type: 'resetAuth' },
-              { type: 'resetError' },
+              { type: 'action_resetError' },
               ({ context, event }) => {
                 const authApiResponse = event.output;
                 context.context.credential = {} as TEventAuthSigningInParams;
                 if (authApiResponse?.success) {
                   const { accessToken, refreshToken } = (authApiResponse as ICommonFunctionResult<IAuthSigningInResponsePayload>).functionResult;
-                  context.context.isSignedIn = true;
-                  context.context.accessToken = accessToken;
-                  context.context.refreshToken = refreshToken;
+                  context.services.store.dispatch(SetLoggedInAction({ accessToken, refreshToken }));
                 } else {
                   context.context.isAuthError = true;
                   context.context.authError = (authApiResponse as ICommonFunctionResult<IErrorResponsePayload>).functionResult;
@@ -141,43 +117,41 @@ export const authStateMachine = setup({
           },
         },
       },
-      'afterSigningIn': {
+      state_afterSigningIn: {
         always: [
           {
-            guard: 'isAuthError',
-            target: 'signingInError',
+            guard: 'guard_isAuthError',
+            target: 'state_signingInError',
           },
           {
-            target: 'signedIn',
+            target: 'state_signedIn',
           },
         ],
       },
-      'signingInError': {        
-        entry: [{ type: 'showAuthErrorAlert' }],
-        always: [{ target: 'idle' }],
-        exit: [{ type: 'resetError' }],
+      state_signingInError: {        
+        entry: [{ type: 'action_showAuthErrorAlert' }],
+        always: [{ target: 'state_idle' }],
+        exit: [{ type: 'action_resetError' }],
       },
-      'signedIn': {
-        entry: [{ type: 'redirectToTop' }],
-        always: [{ target: 'idle' }],
+      state_signedIn: {
+        always: [{ target: 'state_idle' }],
       },
-      'signingOut': {
+      state_signingOut: {
         always: [
           {
-            target: 'afterSigningOut',
+            target: 'state_afterSigningOut',
             actions: [
-              { type: 'resetError' },
-              { type: 'resetAuth' },
+              { type: 'action_resetError' },
+              ({ context }) => context.services.store.dispatch(SetLoggedOutAction()),
             ],    
           }
         ],
       },
-      'afterSigningOut': {
-        always: [{ target: 'signedOut' }],
+      state_afterSigningOut: {
+        always: [{ target: 'state_signedOut' }],
       },
-      'signedOut': {
-        entry: [{ type: 'redirectToTop' }],
-        always: [{ target: 'idle', actions: [() => window.location.reload()] }],
+      state_signedOut: {
+        always: [{ target: 'state_idle', actions: [() => window.location.reload()] }],
       },
     }
   });

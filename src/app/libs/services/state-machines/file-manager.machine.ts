@@ -51,7 +51,7 @@ export const fileManagerStateMachine = setup({
       context.services.commonService.setAlert({
         type: EAlertType.AT_ERROR,
         title: 'Error',
-        message: context.context.errorDetails.message,
+        message: context.context.errorDetails?.message,
       } as IAlert);
     },
   },

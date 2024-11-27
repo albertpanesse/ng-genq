@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { IconDirective } from '@coreui/icons-angular';
@@ -18,6 +18,9 @@ import {
 } from '@coreui/angular';
 
 import { AuthService } from '../../libs/services/auth.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { StoreService } from 'src/app/libs/services';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'sign-in-comp',
@@ -42,15 +45,27 @@ import { AuthService } from '../../libs/services/auth.service';
       NgStyle,
     ]
 })
-export class SignInComponent {
+export class SignInComponent implements OnInit {
+
+  readonly #destroyRef: DestroyRef = inject(DestroyRef);
 
   signInForm!: FormGroup;
 
-  constructor(private authService: AuthService, private formBuilder: FormBuilder) {
+  constructor(private authService: AuthService, private router: Router, private storeService: StoreService, private formBuilder: FormBuilder) {
     this.signInForm = this.formBuilder.group({
       username: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
     });
+  }
+  
+  ngOnInit(): void {
+    this.storeService.getIsUserLoggedInState()
+      .pipe(takeUntilDestroyed(this.#destroyRef))
+      .subscribe((isUserLoggedIn: boolean) => {
+        if (isUserLoggedIn) {
+          this.router.navigate(['/-/dsb']);
+        }
+      });
   }
 
   handlerOnSubmit = () => {
