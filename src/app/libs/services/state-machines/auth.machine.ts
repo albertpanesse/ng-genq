@@ -7,7 +7,7 @@ import { IAuthSigningInResponsePayload, ICommonFunctionResult, IErrorResponsePay
 import { ApiService, CommonService, EAlertType, IAlert } from "../";
 import { IRootContext } from ".";
 import { IGlobalState } from "../store";
-import { SetLoggedInAction, SetLoggedOutAction } from "../store/actions";
+import { setIsUserLoggedInAction, setTokensAction } from "../store/actions";
 
 export interface IStateAuthServices {
   apiService: ApiService;
@@ -83,11 +83,13 @@ export const authStateMachine = setup({
         on: {
           event_signingIn: {
             target: 'state_signingIn',
-            actions: assign({
-              context: ({ event }) => ({
-                credential: event.params as TEventAuthSigningInParams,
-              } as IStateAuthContext),
-            }),
+            actions: [
+              assign({
+                context: ({ event }) => ({
+                  credential: event.params as TEventAuthSigningInParams,
+                } as IStateAuthContext),
+              }),
+            ],
           },
           event_signingOut: {
             target: 'state_signingOut',
@@ -95,6 +97,7 @@ export const authStateMachine = setup({
         }
       },
       state_signingIn: {
+        entry: [({ context }) => context.services.commonService.setLoader(true)],
         invoke: {
           src: 'actor_signingIn',
           input: ({ context: { services: { apiService }, context: { credential } } }) => ({ apiService, credential }),
@@ -107,7 +110,8 @@ export const authStateMachine = setup({
                 context.context.credential = {} as TEventAuthSigningInParams;
                 if (authApiResponse?.success) {
                   const { accessToken, refreshToken } = (authApiResponse as ICommonFunctionResult<IAuthSigningInResponsePayload>).functionResult;
-                  context.services.store.dispatch(SetLoggedInAction({ accessToken, refreshToken }));
+                  context.services.store.dispatch(setIsUserLoggedInAction({ isUserLoggedIn: true }));
+                  context.services.store.dispatch(setTokensAction({ accessToken, refreshToken }));
                 } else {
                   context.context.isAuthError = true;
                   context.context.authError = (authApiResponse as ICommonFunctionResult<IErrorResponsePayload>).functionResult;
@@ -137,12 +141,13 @@ export const authStateMachine = setup({
         always: [{ target: 'state_idle' }],
       },
       state_signingOut: {
+        entry: [({ context }) => context.services.commonService.setLoader(true)],
         always: [
           {
             target: 'state_afterSigningOut',
             actions: [
               { type: 'action_resetError' },
-              ({ context }) => context.services.store.dispatch(SetLoggedOutAction()),
+              ({ context }) => context.services.store.dispatch(setIsUserLoggedInAction({ isUserLoggedIn: false })),
             ],    
           }
         ],

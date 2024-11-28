@@ -19,7 +19,7 @@ import {
 
 import { AuthService } from '../../libs/services/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { StoreService } from 'src/app/libs/services';
+import { CommonService, StoreService } from 'src/app/libs/services';
 import { Router } from '@angular/router';
 
 @Component({
@@ -51,7 +51,7 @@ export class SignInComponent implements OnInit {
 
   signInForm!: FormGroup;
 
-  constructor(private authService: AuthService, private router: Router, private storeService: StoreService, private formBuilder: FormBuilder) {
+  constructor(private authService: AuthService, private commonService: CommonService, private router: Router, private storeService: StoreService, private formBuilder: FormBuilder) {
     this.signInForm = this.formBuilder.group({
       username: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
@@ -66,6 +66,8 @@ export class SignInComponent implements OnInit {
           this.router.navigate(['/-/dsb']);
         }
       });
+
+    this.commonService.setLoader(false);
   }
 
   handlerOnSubmit = () => {

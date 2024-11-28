@@ -8,7 +8,10 @@ export const isUserLoggedInSelector = createSelector(
   (app) => app.isUserLoggedIn
 );
 
-export const accessTokenSelector = createSelector(
+export const tokensSelector = createSelector(
   appSelector,
-  (app) => app.accessToken
+  (app) => ({
+    accessToken: app.accessToken,
+    refreshToken: app.refreshToken,
+  })
 );

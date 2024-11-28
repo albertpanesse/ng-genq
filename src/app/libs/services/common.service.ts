@@ -33,11 +33,20 @@ export const createAlert = function(type: EAlertType, title: string, message: st
 })
 export class CommonService {
   private _alertSubject$: BehaviorSubject<IAlert[]> = new BehaviorSubject([] as IAlert[]);
+  private _loaderSubject$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(private router: Router) {}
 
   getAlertSubject(): BehaviorSubject<IAlert[]> {
     return this._alertSubject$;
+  }
+
+  setLoader(isLoading: boolean): void {
+    this._loaderSubject$.next(isLoading);
+  }
+
+  getLoaderSubject(): BehaviorSubject<boolean> {
+    return this._loaderSubject$;
   }
 
   setAlert(alert: IAlert): void {

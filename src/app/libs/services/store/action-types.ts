@@ -1,3 +1,3 @@
-export const SetLoggedIn = 'SetLoggedIn';
-export const SetLoggedOut = 'SetLoggedOut';
+export const SetIsUserLoggedIn = 'SetIsUserLoggedIn';
+export const SetTokens = 'SetTokens';
 

@@ -7,19 +7,20 @@ import { delay, filter, map, tap } from 'rxjs/operators';
 import { ColorModeService } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from './icons/icon-subset';
-import { AlertComponent } from "./components/alert/alert.component";
+import { AlertComponent, LoaderComponent } from "./components";
 import { CommonService, IAlert, StoreService } from "./libs/services";
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-root',
-  template: '<router-outlet /><alert-comp [alerts]="alerts" />',
+  template: '<router-outlet /><alert-comp [alerts]="alerts" /><loader-comp [showLoader]="showLoader" />',
   standalone: true,
-  imports: [RouterOutlet, AlertComponent]
+  imports: [RouterOutlet, AlertComponent, LoaderComponent]
 })
 export class AppComponent implements OnInit {
   title = 'GenQ - General Query';
   alerts: IAlert[] = [];
+  showLoader: boolean = true;
 
   readonly #destroyRef: DestroyRef = inject(DestroyRef);
   readonly #activatedRoute: ActivatedRoute = inject(ActivatedRoute);
@@ -68,6 +69,12 @@ export class AppComponent implements OnInit {
         }),
         takeUntilDestroyed(this.#destroyRef)
       )
-      .subscribe();    
+      .subscribe();
+    
+    this.commonService.getLoaderSubject()
+      .pipe(takeUntilDestroyed(this.#destroyRef))
+      .subscribe((isLoading: boolean) => {
+        this.showLoader = isLoading;
+      });
   }
 }
