@@ -1,6 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import { IAppState, IUserState } from '.';
-import { SetLoggedInAction, SetLoggedOutAction } from './actions';
+import { setIsUserLoggedInAction, setTokensAction } from './actions';
 
 const initialAppState: IAppState = {
   isUserLoggedIn: false,
@@ -10,20 +10,17 @@ const initialAppState: IAppState = {
 
 export const appReducer = createReducer(
   initialAppState,
-  on(SetLoggedInAction, (state: IAppState, props: any) => {
+  on(setIsUserLoggedInAction, (state: IAppState, props: any) => {
     return {
       ...state,
-      isUserLoggedIn: true,
-      accessToken: props.accessToken,
-      refreshToken: props.refreshToken,
+      isUserLoggedIn: props.isUserLoggedIn,
     };
   }),
-  on(SetLoggedOutAction, (state: IAppState) => {
+  on(setTokensAction, (state: IAppState, props: any) => {
     return {
       ...state,
-      isUserLoggedIn: false,
-      accessToken: '',
-      refreshToken: '',
+      accessToken: props.accessToken,
+      refreshToken: props.refreshToken,
     };
   }),
 );
