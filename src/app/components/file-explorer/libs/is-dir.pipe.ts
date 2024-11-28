@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-import { ITreeItem } from "../file-explorer.module";
+import { ITreeItem } from "../libs/types";
 
 @Pipe({
   name: 'isDir',

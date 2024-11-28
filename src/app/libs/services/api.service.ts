@@ -6,6 +6,7 @@ import { Store } from '@ngrx/store';
 import { tokensSelector } from './store/selectors';
 import { setTokensAction } from './store/actions';
 import { IApiResponse } from '../types';
+import { REFRESH_TOKEN_URL } from '../consts';
 
 @Injectable({
   providedIn: 'root',
@@ -43,7 +44,10 @@ export class ApiService {
 
     this.#isRefreshing = true;
     try {
-      const result = await lastValueFrom(this.http.post<IApiResponse>('/auth/refresh', {}));
+      const { refreshToken } = await this.#getTokens();
+      const result = await lastValueFrom(this.http.post<IApiResponse>(REFRESH_TOKEN_URL, {
+        refreshToken,
+      }));
       if (result?.success) {
         const { accessToken, refreshToken } = result.payload;
         this.store.dispatch(setTokensAction({ accessToken, refreshToken }));

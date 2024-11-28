@@ -1,6 +1,7 @@
 import { ActionReducer, ActionReducerMap, MetaReducer, INIT, UPDATE } from '@ngrx/store';
-import { appReducer, userReducer } from './reducers';
+import { appReducer, fileRepoReducer, userReducer } from './reducers';
 import { IUser } from '../../models';
+import { IUserFile } from '../../types';
 
 export interface IAppState {
   isUserLoggedIn: boolean;
@@ -10,14 +11,20 @@ export interface IAppState {
 
 export interface IUserState extends IUser {}
 
+export interface IFileRepoState {
+  fileDirList: IUserFile[];
+}
+
 export interface IGlobalState {
   app: IAppState;
   user: IUserState;
+  fileRepo: IFileRepoState;
 }
 
 export const reducers: ActionReducerMap<IGlobalState> = {
   app: appReducer,
   user: userReducer,
+  fileRepo: fileRepoReducer,
 };
 
 export function storageMetaReducer(reducer: ActionReducer<IGlobalState>): ActionReducer<IGlobalState> {

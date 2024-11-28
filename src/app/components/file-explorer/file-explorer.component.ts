@@ -6,7 +6,7 @@ import { IconDirective } from '@coreui/icons-angular';
 import { ButtonDirective } from '@coreui/angular';
 
 import { DirectoryTreeComponent, FileBrowserComponent } from "./components";
-import { ITreeItem } from "./file-explorer.module";
+import { ITreeItem } from "./libs/types";
 
 @Component({
   selector: 'filetree-explorer-comp',

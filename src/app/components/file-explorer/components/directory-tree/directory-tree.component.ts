@@ -8,7 +8,7 @@ import { ButtonDirective } from '@coreui/angular';
 import { cilPlus, cilMinus, cilFolder, cilFolderOpen, cilOptions } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 
-import { EFileType, ITreeItem } from "../../file-explorer.module";
+import { EFileType, ITreeItem } from "../../libs/types";
 import { DashboardComponent } from "../../../../pages/dashboard/dashboard.component";
 import { EContextMenuAction, IsDirPipe } from "../../libs";
 

@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, SimpleChanges } from "@angular/core";
 import { CommonModule } from "@angular/common";
 
-import { ITreeItem } from "../../file-explorer.module";
+import { ITreeItem } from "../../libs/types";
 import { CreateDirDialogComponent } from "../create-dir-dialog/create-dir-dialog.component";
 
 @Component({

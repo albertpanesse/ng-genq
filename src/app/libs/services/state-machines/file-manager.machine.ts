@@ -5,6 +5,7 @@ import { ApiService, CommonService, EAlertType, IAlert } from "../";
 import { IRootContext } from ".";
 import { IGlobalState } from "../store";
 import { Store } from "@ngrx/store";
+import { setFileDirListAction } from "../store/actions";
 
 export interface IStateFileManagerServices {
   apiService: ApiService;
@@ -111,6 +112,7 @@ export const fileManagerStateMachine = setup({
                 const apiResponse = event.output;
                 if (apiResponse?.success) {
                   const fileDirList = (apiResponse as ICommonFunctionResult<TFileManagerListingResponsePayload>).functionResult;
+                  context.services.store.dispatch(setFileDirListAction({ fileDirList }));
                 } else {
                   context.context.isError = true;
                   context.context.errorDetails = (apiResponse as ICommonFunctionResult<IErrorResponsePayload>).functionResult;

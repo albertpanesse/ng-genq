@@ -1,5 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
-import { IAppState, IUserState } from '.';
+import { IAppState, IFileRepoState, IUserState } from '.';
 import { setIsUserLoggedInAction, setTokensAction } from './actions';
 
 const initialAppState: IAppState = {
@@ -32,4 +32,12 @@ const initialUserState: IUserState = {
 
 export const userReducer = createReducer(
   initialUserState,
+);
+
+const initialFileRepoState: IFileRepoState = {
+  fileDirList: [],
+};
+
+export const fileRepoReducer = createReducer(
+  initialFileRepoState,
 );
