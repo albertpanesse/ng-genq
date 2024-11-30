@@ -62,16 +62,18 @@ export class ApiService {
     }
   }
 
-  async #handleRequest<T>(url: string, request: () => Promise<T>): Promise<T> {
+  async #handleRequest<T>(url: string, request: (accessToken: string) => Promise<T>): Promise<T> {
     try {
-      return await request();
+      return await request('');
     } catch (error: any) {
       if (error instanceof HttpErrorResponse && error.status === 401) {
         console.error('Unauthorized error (401), attempting token refresh...');
         try {
           await this.#refreshToken();
           console.info('Token refreshed successfully. Retrying request...');
-          return await request(); // Retry the original request.
+          const { accessToken } = await this.#getTokens();
+          console.log('new token', accessToken);
+          return await request(accessToken); // Retry the original request.
         } catch (refreshError) {
           console.error('Failed to refresh token:', refreshError);
           throw refreshError;
@@ -91,8 +93,12 @@ export class ApiService {
     isNeedAuthorization: boolean = false
   ): Promise<T> {
     const headers = await this.#mergeHeaders(isNeedAuthorization, additionalHeaders);
-    return this.#handleRequest(url, () =>
-      lastValueFrom(this.http.get<T>(url, { params, headers }))
+    return this.#handleRequest(url, (accessToken: string = '') => {
+      if (accessToken) {
+        headers.set('Authorization', `Bearer ${accessToken}`);
+      }
+      return lastValueFrom(this.http.get<T>(url, { params, headers }));
+    }
     );
   }
 

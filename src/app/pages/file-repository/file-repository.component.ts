@@ -26,6 +26,7 @@ export class FileRepositoryComponent implements OnInit {
     this.storeService.getFileDirListState()
       .pipe(takeUntilDestroyed(this.#destroyRef))
       .subscribe((fileDirList: IUserFile[]) => {
+        console.log('fileDirList', fileDirList);
         this.items = transformUserFilesToTree(fileDirList);
       });
   }

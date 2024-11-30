@@ -1,4 +1,4 @@
-import { Component, Input } from "@angular/core";
+import { Component, Input, OnChanges, SimpleChanges } from "@angular/core";
 import { CommonModule } from '@angular/common';
 
 import { cilArrowThickFromBottom } from '@coreui/icons';
@@ -15,11 +15,17 @@ import { ITreeItem } from "./libs/types";
   standalone: true,
   imports: [ButtonDirective, CommonModule, DirectoryTreeComponent, FileBrowserComponent, IconDirective]
 })
-export class FileExplorerComponent {
+export class FileExplorerComponent implements OnChanges {
   @Input() items: ITreeItem[] = [];
  
   icons = { cilArrowThickFromBottom };
   currentActiveDirectory: ITreeItem | null = null;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['items']) {
+      console.log('items', changes['items'].currentValue);
+    }
+  }
 
   handlerOnDirectorySelected = (item: ITreeItem) => {
     this.currentActiveDirectory = item;
