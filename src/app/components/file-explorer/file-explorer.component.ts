@@ -23,7 +23,7 @@ export class FileExplorerComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['items']) {
-      console.log('items', changes['items'].currentValue);
+      console.log('changes.items', changes['items'].currentValue);
     }
   }
 

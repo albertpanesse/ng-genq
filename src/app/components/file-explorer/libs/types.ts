@@ -1,4 +1,5 @@
 export enum EContextMenuAction {
+  CREATE,
   COPY,
   CUT,
   PASTE,

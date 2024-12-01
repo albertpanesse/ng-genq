@@ -4,20 +4,19 @@ import { RouterModule } from "@angular/router";
 
 import { NavModule } from '@coreui/angular';
 import { PopoverModule } from '@coreui/angular';
-import { ButtonDirective } from '@coreui/angular';
 import { cilPlus, cilMinus, cilFolder, cilFolderOpen, cilOptions } from '@coreui/icons';
 import { IconDirective } from '@coreui/icons-angular';
 
 import { EFileType, ITreeItem } from "../../libs/types";
-import { DashboardComponent } from "../../../../pages/dashboard/dashboard.component";
 import { EContextMenuAction, IsDirPipe } from "../../libs";
+import { CreateDirDialogComponent } from "../create-dir-dialog/create-dir-dialog.component";
 
 @Component({
   selector: 'directory-tree-comp',
   templateUrl: 'directory-tree.component.html',
   styleUrls: ['directory-tree.component.scss'],
   standalone: true,
-  imports: [CommonModule, ButtonDirective, IconDirective, IsDirPipe, DashboardComponent, NavModule, PopoverModule, RouterModule]
+  imports: [CommonModule, CreateDirDialogComponent, IconDirective, IsDirPipe, NavModule, PopoverModule, RouterModule]
 })
 export class DirectoryTreeComponent implements OnInit {
   @Input() items: ITreeItem[] = [];
@@ -27,27 +26,14 @@ export class DirectoryTreeComponent implements OnInit {
 
   icons = { cilPlus, cilMinus, cilFolder, cilFolderOpen, cilOptions };
   isContextMenuVisible: boolean = false;
+  isCreateDirDialogVisible: boolean = false;
   currentActiveDirectory!: ITreeItem;
-  treeItems: ITreeItem[] = [];
   contextMenuAction = EContextMenuAction;
 
   constructor(private renderer: Renderer2) {}
 
   ngOnInit(): void {
-    this.treeItems[0] = {
-      fileItem: {
-        id: 'root',
-        isDir: true,
-        title: 'Root Directory',
-        fileSize: 0,
-        fileType: EFileType.NONE,
-        lastUpdate: '',
-        children: this.items,  
-      },
-      isExpanded: true,
-      isOpened: true,
-    };
-    this.currentActiveDirectory = this.treeItems[0];
+    this.handlerOnTreeItemClicked(this.items[0]);
 
     this.renderer.listen('document', 'mousedown', () => {
       this.isContextMenuVisible = false;
@@ -59,7 +45,7 @@ export class DirectoryTreeComponent implements OnInit {
   }
 
   handlerOnTreeItemClicked = (item: ITreeItem) => {
-    this.currentActiveDirectory.isOpened = false;
+    if (this.currentActiveDirectory) this.currentActiveDirectory.isOpened = false;
 
     item.isOpened = !item.isOpened;
     this.currentActiveDirectory = item;
@@ -67,5 +53,15 @@ export class DirectoryTreeComponent implements OnInit {
     this.onDirectorySelected.emit(item);
   }
 
-  handlerOnContextAction = (contextMenuAction: EContextMenuAction) => {}
+  handlerOnContextAction = (contextMenuAction: EContextMenuAction) => {
+    switch (contextMenuAction) {
+      case EContextMenuAction.CREATE:
+        this.isCreateDirDialogVisible = true;
+        break;
+    }
+  }
+
+  handlerOnCreateDirDialogClosed = () => {
+    this.isCreateDirDialogVisible = false;
+  }
 }

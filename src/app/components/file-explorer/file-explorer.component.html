@@ -4,10 +4,10 @@
   </div>
   <div class="file-explorer-wrapper">
     <div class="file-explorer-filetree">
-      <directory-tree-comp [items]="items" (onDirectorySelected)="handlerOnDirectorySelected($event)"></directory-tree-comp>
+      <directory-tree-comp [items]="items" (onDirectorySelected)="handlerOnDirectorySelected($event)" />
     </div>
     <div class="file-explorer-browser">
-      <file-browser-comp [items]="currentActiveDirectory && currentActiveDirectory.fileItem.children && currentActiveDirectory.fileItem.children.length > 0 ? currentActiveDirectory.fileItem.children : items"></file-browser-comp>
+      <file-browser-comp [items]="currentActiveDirectory?.fileItem?.children" />
     </div>  
   </div>
 </div>

@@ -70,9 +70,7 @@ export class ApiService {
         console.error('Unauthorized error (401), attempting token refresh...');
         try {
           await this.#refreshToken();
-          console.info('Token refreshed successfully. Retrying request...');
           const { accessToken } = await this.#getTokens();
-          console.log('new token', accessToken);
           return await request(accessToken); // Retry the original request.
         } catch (refreshError) {
           console.error('Failed to refresh token:', refreshError);
@@ -94,12 +92,14 @@ export class ApiService {
   ): Promise<T> {
     const headers = await this.#mergeHeaders(isNeedAuthorization, additionalHeaders);
     return this.#handleRequest(url, (accessToken: string = '') => {
+      let updatedHeaders = headers;
+
       if (accessToken) {
-        headers.set('Authorization', `Bearer ${accessToken}`);
+        updatedHeaders = headers.set('Authorization', `Bearer ${accessToken}`);
       }
-      return lastValueFrom(this.http.get<T>(url, { params, headers }));
-    }
-    );
+
+      return lastValueFrom(this.http.get<T>(url, { params, headers: updatedHeaders }));
+    });
   }
 
   // Generic POST request

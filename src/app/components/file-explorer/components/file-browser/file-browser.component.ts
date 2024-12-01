@@ -14,12 +14,13 @@ import { CreateDirDialogComponent } from "../create-dir-dialog/create-dir-dialog
 export class FileBrowserComponent implements OnChanges {
   @Input() items?: ITreeItem[];
 
-  filteredItems: ITreeItem[] | null = null;
+  filteredItems: ITreeItem[] = [];
   isCreateDirDialogVisible: boolean = false;
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['items'] && changes['items'].currentValue && (changes['items'].currentValue as ITreeItem[]).length > 0) {
-      this.filteredItems = (changes['items'].currentValue as ITreeItem[]).filter(item => !item.fileItem.isDir);
+    if (changes['items'] && changes['items'].currentValue) {
+      this.filteredItems = (changes['items'].currentValue as ITreeItem[])?.filter(item => !item.fileItem.isDir) || [];
+      console.log('this.filteredItems', this.filteredItems);
     }
   }
 

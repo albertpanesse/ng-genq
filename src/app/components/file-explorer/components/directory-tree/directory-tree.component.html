@@ -1,7 +1,8 @@
 <div class="directory-tree-wrapper">
-  <div *ngFor="let item of treeItems | isDir">
+  <div *ngFor="let item of items | isDir">
     <ng-container *ngTemplateOutlet="directoryItem; context: { item }"></ng-container>
   </div>
+  <create-dir-dialog-comp [visible]="isCreateDirDialogVisible" (closed)="handlerOnCreateDirDialogClosed()" />
 </div>
 
 <ng-template #directoryItem let-item="item">
@@ -31,6 +32,8 @@
 
 <ng-template #contextMenu>
   <c-nav variant="pills" class="flex-column">
+    <a cNavLink (click)="handlerOnContextAction(contextMenuAction.CREATE)">Create Directory</a>
+    <hr noshade>
     <a cNavLink (click)="handlerOnContextAction(contextMenuAction.COPY)">Copy</a>
     <a cNavLink (click)="handlerOnContextAction(contextMenuAction.CUT)">Cut</a>
     <a cNavLink (click)="handlerOnContextAction(contextMenuAction.PASTE)">Paste</a>

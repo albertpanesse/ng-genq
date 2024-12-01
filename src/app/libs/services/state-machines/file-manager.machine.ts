@@ -1,5 +1,5 @@
 import { assign, fromPromise, setup } from "xstate";
-import { ICommonFunctionResult, IErrorResponsePayload, IUserFile, TFileManagerListingResponsePayload } from "../../types";
+import { ICommonFunctionResult, IErrorResponsePayload, TFileManagerListingResponsePayload } from "../../types";
 import { creating, deleting, listing, moving, uploading } from "../apis";
 import { ApiService, CommonService, EAlertType, IAlert } from "../";
 import { IRootContext } from ".";
@@ -139,9 +139,6 @@ export const fileManagerStateMachine = setup({
         exit: [{ type: 'action_resetError' }],
       },
       'state_listingSuccess': {
-        entry: [({ event }) => {
-          console.log('event', event);
-        }],
         always: [{ target: 'state_idle' }],
       },
       'state_creating': {},

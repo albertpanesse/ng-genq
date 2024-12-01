@@ -13,7 +13,6 @@ export interface IUserFile {
   userId: number;
   title: string;
   isDir: boolean;
-  isOnRoot: boolean;
   parentId: number;
   fileName: string;
 }
