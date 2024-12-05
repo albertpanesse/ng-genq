@@ -1,0 +1,3 @@
+export const ENV = {
+  "API_URL": "http://10.147.17.139:3000"
+};
