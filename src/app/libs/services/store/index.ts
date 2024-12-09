@@ -30,20 +30,20 @@ export const reducers: ActionReducerMap<IGlobalState> = {
 export function storageMetaReducer(reducer: ActionReducer<IGlobalState>): ActionReducer<IGlobalState> {
   return function (state, action) {
     if (action.type === INIT || action.type === UPDATE) {
-      const storageValue = localStorage.getItem('__GENQ__');
+      const storageValue = sessionStorage.getItem('__GENQ__');
       
       if (storageValue) {
         try {
           return JSON.parse(storageValue);
         } catch {
-          localStorage.removeItem('__GENQ__');
+          sessionStorage.removeItem('__GENQ__');
         }
       }
     }
 
     const nextState = reducer(state, action);
 
-    localStorage.setItem('__GENQ__', JSON.stringify(nextState));
+    sessionStorage.setItem('__GENQ__', JSON.stringify(nextState));
 
     return nextState;
   };

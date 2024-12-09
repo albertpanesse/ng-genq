@@ -31,4 +31,8 @@ export class FileBrowserComponent implements OnChanges {
   handlerOnCreateDirDialogClosed = () => {
     this.isCreateDirDialogVisible = false;
   }
+
+  handlerOnFileClick = (item: ITreeItem) => {
+    
+  }
 }

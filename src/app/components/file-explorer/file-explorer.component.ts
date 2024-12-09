@@ -17,17 +17,19 @@ import { ITreeItem } from "./libs/types";
 })
 export class FileExplorerComponent implements OnChanges {
   @Input() items: ITreeItem[] = [];
+  @Input() apiUrls: { [key: string]: string } = {};
  
   icons = { cilArrowThickFromBottom };
-  currentActiveDirectory: ITreeItem | null = null;
+  currentItem!: ITreeItem;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['items']) {
       console.log('changes.items', changes['items'].currentValue);
+      this.currentItem = changes['items'].currentValue[0];
     }
   }
 
   handlerOnDirectorySelected = (item: ITreeItem) => {
-    this.currentActiveDirectory = item;
+    this.currentItem = item;
   }
 }

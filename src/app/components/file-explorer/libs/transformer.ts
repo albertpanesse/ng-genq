@@ -42,7 +42,7 @@ function transformUserFilesToTree(userFiles: IUserFile[]): ITreeItem[] {
       const treeItem: ITreeItem = {
         fileItem,
         isExpanded: file.id == 1,
-        isOpened: false,
+        isOpened: file.id == 1,
       };
 
       return treeItem;

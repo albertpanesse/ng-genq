@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Store } from "@ngrx/store";
+import { Action, Selector, Store } from "@ngrx/store";
 
 import { IGlobalState } from "./store";
 import { Observable } from "rxjs";
@@ -13,11 +13,14 @@ export class StoreService {
   
   constructor(private store: Store<IGlobalState>) {}
 
-  getIsUserLoggedInState(): Observable<boolean> {
-    return this.store.select(isUserLoggedInSelector);
+  dispatch(action: Action) {
+    this.store.dispatch(action);
   }
 
-  getFileDirListState(): Observable<IUserFile[]> {
-    return this.store.select(fileDirListSelector);
+  subscribe(selector: Selector<T, V>, subscribeFunction: (value: any) => any, errorFunction?: (error: any) => void) {
+    return this.store.select(selector).subscribe({
+      next: subscribeFunction,
+      error: errorFunction
+    });
   }
 }

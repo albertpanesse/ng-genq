@@ -37,4 +37,8 @@ export class FileManagerService {
   create(dirName: string) {
     this.fileManagerActor.send({ type: 'event_creating', params: { dirName } });
   }
+
+  previewFile() {
+    
+  }
 }

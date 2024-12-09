@@ -21,13 +21,13 @@ import { CreateDirDialogComponent } from "../create-dir-dialog/create-dir-dialog
 export class DirectoryTreeComponent implements OnInit {
   @Input() items: ITreeItem[] = [];
   @Input() isSelected: boolean = false;
+  @Input() currentItem!: ITreeItem;
 
   @Output() onDirectorySelected = new EventEmitter<ITreeItem>();
 
   icons = { cilPlus, cilMinus, cilFolder, cilFolderOpen, cilOptions };
   isContextMenuVisible: boolean = false;
   isCreateDirDialogVisible: boolean = false;
-  currentActiveDirectory!: ITreeItem;
   contextMenuAction = EContextMenuAction;
 
   constructor(private renderer: Renderer2) {}
@@ -45,10 +45,10 @@ export class DirectoryTreeComponent implements OnInit {
   }
 
   handlerOnTreeItemClicked = (item: ITreeItem) => {
-    if (this.currentActiveDirectory) this.currentActiveDirectory.isOpened = false;
+    if (this.currentItem) this.currentItem.isOpened = false;
 
     item.isOpened = !item.isOpened;
-    this.currentActiveDirectory = item;
+    this.currentItem = item;
 
     this.onDirectorySelected.emit(item);
   }
