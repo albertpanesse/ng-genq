@@ -21,7 +21,7 @@ import { CreateDirDialogComponent } from "../create-dir-dialog/create-dir-dialog
 export class DirectoryTreeComponent implements OnInit {
   @Input() items: ITreeItem[] = [];
   @Input() isSelected: boolean = false;
-  @Input() currentItem!: ITreeItem;
+  @Input() currentItem: ITreeItem | null = null;
 
   @Output() onDirectorySelected = new EventEmitter<ITreeItem>();
 

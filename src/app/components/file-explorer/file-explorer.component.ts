@@ -20,7 +20,7 @@ export class FileExplorerComponent implements OnChanges {
   @Input() apiUrls: { [key: string]: string } = {};
  
   icons = { cilArrowThickFromBottom };
-  currentItem!: ITreeItem;
+  currentItem: ITreeItem | null = null;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['items']) {
