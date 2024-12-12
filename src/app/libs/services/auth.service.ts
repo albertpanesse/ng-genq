@@ -21,7 +21,7 @@ export class AuthService {
         services: {
           apiService: this.apiService,
           commonService: this.commonService,  
-          authService: this,
+          store: this.store,
         },
       },
     }).start();
