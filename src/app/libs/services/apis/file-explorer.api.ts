@@ -1,13 +1,13 @@
-import { IApiResponse, ICommonFunctionResult, IErrorResponsePayload, TFileManagerListingResponsePayload } from "../../types";
+import { IApiResponse, ICommonFunctionResult, IErrorResponsePayload, TFileExplorerListingResponsePayload } from "../../types";
 import { USER_FILE_LIST } from '../../consts';
 
-export const listing = async ({ input: { apiService } }: any): Promise<ICommonFunctionResult<TFileManagerListingResponsePayload> | ICommonFunctionResult<IErrorResponsePayload>> => {
+export const listing = async ({ input: { apiService } }: any): Promise<ICommonFunctionResult<TFileExplorerListingResponsePayload> | ICommonFunctionResult<IErrorResponsePayload>> => {
   try {
     const result: IApiResponse = await apiService.get(USER_FILE_LIST, null, {}, true);
     return {
       success: result.success,
       functionResult: result.payload,
-    } as ICommonFunctionResult<TFileManagerListingResponsePayload>;
+    } as ICommonFunctionResult<TFileExplorerListingResponsePayload>;
   } catch (error: any) {
     return {
       success: false,
@@ -29,5 +29,9 @@ export const moving = async () => {
 }
 
 export const deleting = async () => {
+  return { success: false };
+}
+
+export const previewing = async () => {
   return { success: false };
 }

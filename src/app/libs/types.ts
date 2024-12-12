@@ -17,9 +17,11 @@ export interface IUserFile {
   fileName: string;
 }
 
-export type TFileManagerListingResponsePayload = IUserFile[];
+export type TFileExplorerListingResponsePayload = IUserFile[];
 
-export interface IFileManagerCreatingResponsePayload {}
+export type TFileExplorerPreviewingResponsePayload = string;
+
+export interface IFileExplorerCreatingResponsePayload {}
 
 export interface IErrorObject {
   code: EError;

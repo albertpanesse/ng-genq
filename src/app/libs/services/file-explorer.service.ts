@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { ApiService, CommonService } from ".";
-import { fileExplorerStateMachine, IStateFileManagerContext } from "./state-machines";
+import { fileExplorerStateMachine } from "./state-machines";
 import { createActor } from "xstate";
 import { Subject } from "rxjs";
 import { IUserFile } from "../types";
