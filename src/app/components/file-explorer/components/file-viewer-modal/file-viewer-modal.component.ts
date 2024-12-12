@@ -27,7 +27,7 @@ import { ITreeItem } from "../../libs";
   ],
 })
 export class FileViewerModalComponent {
-  @Input() viewItem: ITreeItem | null = null;
+  @Input() fileContent: string = '';
   @Input() visible: boolean = false;
 
   editorOptions = {
@@ -35,5 +35,4 @@ export class FileViewerModalComponent {
     language: 'javascript',
     automaticLayout: true,
   }
-  txtContent: string = '';
 }

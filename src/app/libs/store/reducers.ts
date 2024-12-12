@@ -1,6 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import { IAppState, IFileRepoState, IUserState } from '.';
-import { setFileDirListAction, setIsUserLoggedInAction, setTokensAction } from './actions';
+import { setFileContentAction, setFileDirListAction, setIsUserLoggedInAction, setTokensAction } from './actions';
 
 const initialAppState: IAppState = {
   isUserLoggedIn: false,
@@ -36,11 +36,17 @@ export const userReducer = createReducer(
 
 const initialFileRepoState: IFileRepoState = {
   fileDirList: [],
+  fileContent: '',
 };
 
 export const fileRepoReducer = createReducer(
   initialFileRepoState,
   on(setFileDirListAction, (state: IFileRepoState, props: any) => ({
+    ...state,
     fileDirList: props.fileDirList,
+  })),
+  on(setFileContentAction, (state: IFileRepoState, props: any) => ({
+    ...state,
+    fileContent: props.fileContent,
   })),
 );

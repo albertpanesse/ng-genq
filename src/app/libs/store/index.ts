@@ -13,6 +13,7 @@ export interface IUserState extends IUser {}
 
 export interface IFileRepoState {
   fileDirList: IUserFile[];
+  fileContent: string;
 }
 
 export interface IGlobalState {

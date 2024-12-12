@@ -34,11 +34,13 @@ export interface ITreeItem {
 }
 
 export interface IFileExplorerActionPreviewParams {
-  userFileId: number;
+  userFileId: string;
   numberOfLine: number;
 }
 
 export type TFileExplorerActionParams = IFileExplorerActionPreviewParams;
+
+export type TFileExplorerActionResult = string;
 
 export enum EFileExplorerActions {
   FE_PREVIEW,

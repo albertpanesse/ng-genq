@@ -171,7 +171,7 @@ export const fileExplorerStateMachine = setup({
       state_previewing: {
         invoke: {
           src: 'actor_previewing',
-          input: ({ context: { services: { apiService } } }) => ({ apiService }),
+          input: ({ context: { services: { apiService }, context: { params } } }) => ({ apiService, params: params.previewing }),
           onDone: {
             target: 'state_afterPreviewing',
             actions: [

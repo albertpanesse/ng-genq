@@ -3,11 +3,12 @@ import { FileExplorerService } from "src/app/libs/services";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { IUserFile } from "src/app/libs/types";
 import { FileExplorerComponent } from "src/app/components/file-explorer/file-explorer.component";
-import { EFileExplorerActions, IFileExplorerActionPreviewParams, ITreeItem, TFileExplorerActionParams } from "src/app/components/file-explorer/libs";
+import { EFileExplorerActions, IFileExplorerActionPreviewParams, ITreeItem, TFileExplorerActionParams, TFileExplorerActionResult } from "src/app/components/file-explorer/libs";
 import { transformUserFilesToTree } from "../../components/file-explorer/libs/transformer";
 import { IGlobalState } from "src/app/libs/store";
 import { Store } from "@ngrx/store";
-import { fileDirListSelector } from "src/app/libs/store/selectors";
+import { fileContentSelector, fileDirListSelector } from "src/app/libs/store/selectors";
+import { Observable } from "rxjs";
 
 @Component({
   selector: 'file-repository-comp',
@@ -18,15 +19,17 @@ import { fileDirListSelector } from "src/app/libs/store/selectors";
 })
 export class FileRepositoryComponent implements OnInit {
   items: ITreeItem[] = [];
-  actions = new Map<EFileExplorerActions, <T>(params: TFileExplorerActionParams, callback: () => Promise<T>) => void>();
+  actions = new Map<EFileExplorerActions, (params: TFileExplorerActionParams) => Observable<TFileExplorerActionResult>>();
 
   readonly #destroyRef: DestroyRef = inject(DestroyRef);
 
   constructor(private fileExplorerService: FileExplorerService, private store: Store<IGlobalState>) {
     this.actions.set(
       EFileExplorerActions.FE_PREVIEW,
-      <T>(params: TFileExplorerActionParams, callback: () => Promise<T>): void => {
-        this.fileExplorerService.previewFile(params, callback);
+      (params: TFileExplorerActionParams): Observable<string> => {
+        this.fileExplorerService.previewFile(params);
+
+        return this.store.select(fileContentSelector);
       }
     )
   }
@@ -40,6 +43,4 @@ export class FileRepositoryComponent implements OnInit {
         this.items = transformUserFilesToTree(fileDirList);
       });
   }
-
-  handlerFileExplorerPreviewCallback = () => {}
 }

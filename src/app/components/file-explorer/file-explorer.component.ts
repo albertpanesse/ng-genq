@@ -6,7 +6,8 @@ import { IconDirective } from '@coreui/icons-angular';
 import { ButtonDirective } from '@coreui/angular';
 
 import { DirectoryTreeComponent, FileBrowserComponent } from "./components";
-import { EFileExplorerActions, ITreeItem, TFileExplorerActionParams } from "./libs/types";
+import { EFileExplorerActions, ITreeItem, TFileExplorerActionParams, TFileExplorerActionResult } from "./libs/types";
+import { Observable } from "rxjs";
 
 @Component({
   selector: 'filetree-explorer-comp',
@@ -17,7 +18,7 @@ import { EFileExplorerActions, ITreeItem, TFileExplorerActionParams } from "./li
 })
 export class FileExplorerComponent implements OnChanges {
   @Input() items: ITreeItem[] = [];
-  @Input() actions?: Map<EFileExplorerActions, (<T>(params: TFileExplorerActionParams, callback: () => Promise<T>) => void)>;
+  @Input() actions?: Map<EFileExplorerActions, (params: TFileExplorerActionParams) => Observable<TFileExplorerActionResult>>;
 
   icons = { cilArrowThickFromBottom };
   currentItem: ITreeItem | null = null;

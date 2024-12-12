@@ -1,9 +1,11 @@
-import { Component, Input, OnChanges, SimpleChanges } from "@angular/core";
+import { Component, DestroyRef, inject, Input, OnChanges, SimpleChanges } from "@angular/core";
 import { CommonModule } from "@angular/common";
 
-import { EFileExplorerActions, ITreeItem, TFileExplorerActionParams } from "../../libs/types";
+import { EFileExplorerActions, IFileExplorerActionPreviewParams, ITreeItem, TFileExplorerActionParams, TFileExplorerActionResult } from "../../libs/types";
 import { CreateDirDialogComponent } from "../create-dir-dialog/create-dir-dialog.component";
 import { FileViewerModalComponent } from "../file-viewer-modal/file-viewer-modal.component";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { Observable } from "rxjs";
 
 @Component({
   selector: 'file-browser-comp',
@@ -14,11 +16,13 @@ import { FileViewerModalComponent } from "../file-viewer-modal/file-viewer-modal
 })
 export class FileBrowserComponent implements OnChanges {
   @Input() items?: ITreeItem[];
-  @Input() actions?: Map<EFileExplorerActions, (<T>(params: TFileExplorerActionParams, callback: () => Promise<T>) => void)>;
+  @Input() actions?: Map<EFileExplorerActions, (params: TFileExplorerActionParams) => Observable<TFileExplorerActionResult>>;
+
+  readonly #destroyRef: DestroyRef = inject(DestroyRef);
 
   filteredItems: ITreeItem[] = [];
   isCreateDirDialogVisible: boolean = false;
-  viewItem: ITreeItem | null = null;
+  fileContent: string = '';
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['items'] && changes['items'].currentValue) {
@@ -35,6 +39,16 @@ export class FileBrowserComponent implements OnChanges {
   }
 
   handlerOnFileClick = (item: ITreeItem) => {
-    this.viewItem = item;
+    const action = this.actions?.get(EFileExplorerActions.FE_PREVIEW);
+    if (action) {
+      action({
+        userFileId: item.fileItem.id,
+        numberOfLine: 20,
+      })
+        .pipe(takeUntilDestroyed(this.#destroyRef))
+        .subscribe((fileContent: string) => {
+          this.fileContent = fileContent;
+        });
+    }
   }
 }

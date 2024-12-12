@@ -39,7 +39,7 @@ export class FileExplorerService {
     this.fileExplorerActor.send({ type: 'event_creating', params: { dirName } });
   }
 
-  previewFile<T>(params: TFileExplorerActionParams, callback: () => Promise<T>) {
-    this.fileExplorerActor.send({ type: 'event_previewing', params, callback });
+  previewFile(params: TFileExplorerActionParams) {
+    this.fileExplorerActor.send({ type: 'event_previewing', params });
   }
 }
