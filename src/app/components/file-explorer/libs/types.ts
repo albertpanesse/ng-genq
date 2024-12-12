@@ -32,3 +32,15 @@ export interface ITreeItem {
   isExpanded: boolean;
   isOpened: boolean;
 }
+
+export interface IFileExplorerActionPreviewParams {
+  userFileId: number;
+  numberOfLine: number;
+}
+
+export type TFileExplorerActionParams = IFileExplorerActionPreviewParams;
+
+export enum EFileExplorerActions {
+  FE_PREVIEW,
+  FE_CREATE,
+};

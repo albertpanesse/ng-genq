@@ -1,7 +1,7 @@
 import { assign, fromPromise, setup } from "xstate";
 import { ICommonFunctionResult, IErrorResponsePayload, TFileManagerListingResponsePayload } from "../../types";
 import { creating, deleting, listing, moving, uploading } from "../apis";
-import { ApiService, CommonService, EAlertType, IAlert } from "../";
+import { ApiService, CommonService, EAlertType, IAlert } from "..";
 import { IRootContext } from ".";
 import { IGlobalState } from "../../store";
 import { Store } from "@ngrx/store";
@@ -34,7 +34,7 @@ interface TEventFileManagerMovingParams {}
 
 interface TEventFileManagerDeletingParams {}
 
-export const fileManagerStateMachine = setup({
+export const fileExplorerStateMachine = setup({
   types: {
     context: {} as IRootContext<IStateFileManagerServices, IStateFileManagerContext>,
     events: {} as IStateFileManagerEvent<'event_listing'> | 

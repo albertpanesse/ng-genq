@@ -1,21 +1,22 @@
 import { Injectable } from "@angular/core";
 import { ApiService, CommonService } from ".";
-import { fileManagerStateMachine, IStateFileManagerContext } from "./state-machines";
+import { fileExplorerStateMachine, IStateFileManagerContext } from "./state-machines";
 import { createActor } from "xstate";
 import { Subject } from "rxjs";
 import { IUserFile } from "../types";
 import { IGlobalState } from "../store";
 import { Store } from "@ngrx/store";
+import { TFileExplorerActionParams } from "src/app/components/file-explorer/libs";
 
 @Injectable({
   providedIn: 'root',
 })
-export class FileManagerService {
-  private fileManagerActor: any;
+export class FileExplorerService {
+  private fileExplorerActor: any;
   private fileDirListObs$: Subject<IUserFile[]> = new Subject();
 
   constructor(private store: Store<IGlobalState>, private apiService: ApiService, private commonService: CommonService) {
-    this.fileManagerActor = createActor(fileManagerStateMachine, {
+    this.fileExplorerActor = createActor(fileExplorerStateMachine, {
       input: {
         services: {
           apiService: this.apiService,
@@ -25,20 +26,20 @@ export class FileManagerService {
       },
     }).start();
 
-    this.fileManagerActor.subscribe((snapshot: any) => {
+    this.fileExplorerActor.subscribe((snapshot: any) => {
       console.log('snapshot', snapshot);
     });
   }
 
   getList() {
-    this.fileManagerActor.send({ type: 'event_listing' });
+    this.fileExplorerActor.send({ type: 'event_listing' });
   }
 
   create(dirName: string) {
-    this.fileManagerActor.send({ type: 'event_creating', params: { dirName } });
+    this.fileExplorerActor.send({ type: 'event_creating', params: { dirName } });
   }
 
-  previewFile() {
-    
+  previewFile<T>(params: TFileExplorerActionParams, callback: () => Promise<T>) {
+    this.fileExplorerActor.send({ type: 'event_previewing', params });
   }
 }

@@ -10,3 +10,5 @@
   </div>
   <create-dir-dialog-comp [visible]="isCreateDirDialogVisible" (closed)="handlerOnCreateDirDialogClosed()" />
 </div>
+
+<file-viewer-modal-comp [visible]="!!viewItem" [viewItem]="viewItem" />

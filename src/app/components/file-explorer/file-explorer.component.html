@@ -7,7 +7,7 @@
       <directory-tree-comp [items]="items" [currentItem]="currentItem" (onDirectorySelected)="handlerOnDirectorySelected($event)" />
     </div>
     <div class="file-explorer-browser">
-      <file-browser-comp [items]="currentItem?.fileItem?.children" />
+      <file-browser-comp [actions]="actions" [items]="currentItem?.fileItem?.children" />
     </div>  
   </div>
 </div>
