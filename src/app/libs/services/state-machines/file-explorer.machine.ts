@@ -1,5 +1,5 @@
 import { assign, fromPromise, setup } from "xstate";
-import { ICommonFunctionResult, TFileExplorerListingResponsePayload, IErrorResponsePayload } from "../../types";
+import { ICommonFunctionResult, TFileExplorerListingResponsePayload, IErrorResponsePayload, TFileExplorerPreviewingResponsePayload } from "../../types";
 import { creating, deleting, listing, moving, uploading, previewing } from "../apis";
 import { ApiService, CommonService, EAlertType, IAlert } from "..";
 import { IRootContext } from ".";
@@ -168,9 +168,42 @@ export const fileExplorerStateMachine = setup({
         always: [{ target: 'state_idle' }],
       },
       state_creating: {},
-      state_previewing: {},
-      state_afterPreviewing: {},
+      state_previewing: {
+        invoke: {
+          src: 'actor_previewing',
+          input: ({ context: { services: { apiService } } }) => ({ apiService }),
+          onDone: {
+            target: 'state_afterPreviewing',
+            actions: [
+              { type: 'action_resetError' },
+              ({ context, event }) => {
+                const apiResponse = event.output;
+                if (apiResponse?.success) {
+                  const fileDirList = (apiResponse as ICommonFunctionResult<TFileExplorerPreviewingResponsePayload>).functionResult;
+                  // NO CALLBACK, JUST DISPATCH TO STORE
+                } else {
+                  context.context.isError = true;
+                  context.context.errorDetails = (apiResponse as ICommonFunctionResult<IErrorResponsePayload>).functionResult;
+                }
+              },
+            ],
+          },
+        },
+      },
+      state_afterPreviewing: {
+        always: [
+          {
+            guard: 'guard_isError',
+            target: 'state_previewingError',
+          },
+          {
+            target: 'state_previewingSuccess',
+          },
+        ],
+      },
       state_previewingError: {},
-      state_previewingSuccess: {},
+      state_previewingSuccess: {
+        always: [{ target: 'state_idle' }],
+      },
     }
   });
