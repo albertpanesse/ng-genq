@@ -51,7 +51,6 @@ function transformUserFilesToTree(userFiles: IUserFile[]): ITreeItem[] {
     return treeItems;
   }
 
-  console.log('rootItems', rootItems);
   rootItems.push(...createTreeItems(0));
 
   return rootItems;

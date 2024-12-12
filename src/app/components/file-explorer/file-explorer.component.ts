@@ -24,7 +24,6 @@ export class FileExplorerComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['items']) {
-      console.log('changes.items', changes['items'].currentValue);
       this.currentItem = changes['items'].currentValue[0];
     }
   }

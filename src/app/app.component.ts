@@ -42,6 +42,12 @@ export class AppComponent implements OnInit {
     this.translate.addLangs(['en', 'id', 'ar', 'fr']);
     this.translate.setDefaultLang('en');
     this.translate.use('en');
+
+    this.commonService.getLoaderSubject()
+    .pipe(takeUntilDestroyed(this.#destroyRef))
+    .subscribe((isLoading: boolean) => {
+      this.showLoader = isLoading;
+    });
   }
 
   ngOnInit(): void {
@@ -71,12 +77,6 @@ export class AppComponent implements OnInit {
         }),
         takeUntilDestroyed(this.#destroyRef)
       )
-      .subscribe();
-    
-    this.commonService.getLoaderSubject()
-      .pipe(takeUntilDestroyed(this.#destroyRef))
-      .subscribe((isLoading: boolean) => {
-        this.showLoader = isLoading;
-      });
+      .subscribe();    
   }
 }
