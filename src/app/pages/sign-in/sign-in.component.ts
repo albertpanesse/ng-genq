@@ -19,8 +19,11 @@ import {
 
 import { AuthService } from '../../libs/services/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CommonService, StoreService } from 'src/app/libs/services';
+import { CommonService } from 'src/app/libs/services';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { IGlobalState } from '../../libs/store';
+import { isUserLoggedInSelector } from '../../libs/store/selectors';
 
 @Component({
   selector: 'sign-in-comp',
@@ -51,7 +54,13 @@ export class SignInComponent implements OnInit {
 
   signInForm!: FormGroup;
 
-  constructor(private authService: AuthService, private commonService: CommonService, private router: Router, private storeService: StoreService, private formBuilder: FormBuilder) {
+  constructor(
+    private authService: AuthService, 
+    private commonService: CommonService, 
+    private router: Router, 
+    private store: Store<IGlobalState>, 
+    private formBuilder: FormBuilder
+  ) {
     this.signInForm = this.formBuilder.group({
       username: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
@@ -59,7 +68,7 @@ export class SignInComponent implements OnInit {
   }
   
   ngOnInit(): void {
-    this.storeService.getIsUserLoggedInState()
+    this.store.select(isUserLoggedInSelector)
       .pipe(takeUntilDestroyed(this.#destroyRef))
       .subscribe((isUserLoggedIn: boolean) => {
         if (isUserLoggedIn) {

@@ -8,8 +8,10 @@ import { ColorModeService } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from './icons/icon-subset';
 import { AlertComponent, LoaderComponent } from "./components";
-import { CommonService, IAlert, StoreService } from "./libs/services";
+import { CommonService, IAlert } from "./libs/services";
 import { TranslateService } from '@ngx-translate/core';
+import { Store } from '@ngrx/store';
+import { IGlobalState } from './libs/store';
 
 @Component({
   selector: 'app-root',
@@ -30,7 +32,7 @@ export class AppComponent implements OnInit {
   readonly #colorModeService = inject(ColorModeService);
   readonly #iconSetService = inject(IconSetService);
 
-  constructor(private commonService: CommonService, private storeService: StoreService, private translate: TranslateService) {
+  constructor(private commonService: CommonService, private store: Store<IGlobalState>, private translate: TranslateService) {
     this.#titleService.setTitle(this.title);
     // iconSet singleton
     this.#iconSetService.icons = { ...iconSubset };

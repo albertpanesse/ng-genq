@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { lastValueFrom, take } from 'rxjs';
-import { IGlobalState } from './store';
+import { IGlobalState } from '../store';
 import { Store } from '@ngrx/store';
-import { tokensSelector } from './store/selectors';
-import { setTokensAction } from './store/actions';
+import { tokensSelector } from '../store/selectors';
+import { setTokensAction } from '../store/actions';
 import { IApiResponse } from '../types';
 import { REFRESH_TOKEN_URL } from '../consts';
 

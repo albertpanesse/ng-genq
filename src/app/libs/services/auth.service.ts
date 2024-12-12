@@ -7,7 +7,7 @@ import { authStateMachine, IStateAuthContext } from './state-machines';
 import { ApiService, CommonService } from '.';
 import { IAuthCredential } from '../types';
 import { IUser } from '../models';
-import { IGlobalState } from './store';
+import { IGlobalState } from '../store';
 
 @Injectable({
   providedIn: 'root'

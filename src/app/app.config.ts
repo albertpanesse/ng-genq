@@ -18,7 +18,7 @@ import { routes } from './app.routes';
 import { TranslateModule, TranslateLoader } from "@ngx-translate/core";
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
-import { reducers, metaReducers } from "./libs/services/store";
+import { reducers, metaReducers } from "./libs/store";
 
 const httpLoaderFactory: (http: HttpClient) => TranslateHttpLoader = (http: HttpClient) => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 

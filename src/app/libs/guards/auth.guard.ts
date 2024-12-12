@@ -1,19 +1,21 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 
-import { StoreService } from '../services';
 import { lastValueFrom, take } from 'rxjs';
+import { IGlobalState } from '../store';
+import { isUserLoggedInSelector } from '../store/selectors';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
 
-  constructor(private storeService: StoreService, private router: Router) {}
+  constructor(private store: Store<IGlobalState>, private router: Router) {}
 
   async canActivate(): Promise<boolean> {
     
-    const isUserLoggedIn = await lastValueFrom(this.storeService.getIsUserLoggedInState().pipe(take(1)));
+    const isUserLoggedIn = await lastValueFrom(this.store.select(isUserLoggedInSelector).pipe(take(1)));
     if (isUserLoggedIn) {
       return true;
     } else {

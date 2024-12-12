@@ -4,7 +4,7 @@ import { fileManagerStateMachine, IStateFileManagerContext } from "./state-machi
 import { createActor } from "xstate";
 import { Subject } from "rxjs";
 import { IUserFile } from "../types";
-import { IGlobalState } from "./store";
+import { IGlobalState } from "../store";
 import { Store } from "@ngrx/store";
 
 @Injectable({

@@ -1,7 +1,7 @@
 import { ActionReducer, ActionReducerMap, MetaReducer, INIT, UPDATE } from '@ngrx/store';
 import { appReducer, fileRepoReducer, userReducer } from './reducers';
-import { IUser } from '../../models';
-import { IUserFile } from '../../types';
+import { IUser } from '../models';
+import { IUserFile } from '../types';
 
 export interface IAppState {
   isUserLoggedIn: boolean;

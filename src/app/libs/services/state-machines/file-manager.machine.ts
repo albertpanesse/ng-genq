@@ -3,9 +3,9 @@ import { ICommonFunctionResult, IErrorResponsePayload, TFileManagerListingRespon
 import { creating, deleting, listing, moving, uploading } from "../apis";
 import { ApiService, CommonService, EAlertType, IAlert } from "../";
 import { IRootContext } from ".";
-import { IGlobalState } from "../store";
+import { IGlobalState } from "../../store";
 import { Store } from "@ngrx/store";
-import { setFileDirListAction } from "../store/actions";
+import { setFileDirListAction } from "../../store/actions";
 
 export interface IStateFileManagerServices {
   apiService: ApiService;

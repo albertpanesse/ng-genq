@@ -6,8 +6,8 @@ import { signingIn } from "../apis";
 import { IAuthSigningInResponsePayload, ICommonFunctionResult, IErrorResponsePayload } from "../../types";
 import { ApiService, CommonService, EAlertType, IAlert } from "../";
 import { IRootContext } from ".";
-import { IGlobalState } from "../store";
-import { setIsUserLoggedInAction, setTokensAction } from "../store/actions";
+import { IGlobalState } from "../../store";
+import { setIsUserLoggedInAction, setTokensAction } from "../../store/actions";
 
 export interface IStateAuthServices {
   apiService: ApiService;
