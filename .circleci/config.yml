@@ -3,7 +3,7 @@ version: 2.1
 executors:
   node-executor:
     docker:
-      - image: circleci/node:14.18.0  # Use a compatible Node.js image
+      - image: node:20-alpine
     working_directory: ~/project
 
 jobs:
