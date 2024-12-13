@@ -1,54 +1,64 @@
-# This config was automatically generated from your source code
-# Stacks detected: deps:node:.
 version: 2.1
-orbs:
-  node: circleci/node@5
-jobs:
-  test-node:
-    # Install node dependencies and run tests
-    executor: node/default
-    steps:
-      - checkout
-      - node/install-packages:
-          pkg-manager: npm
-      - run:
-          name: Run tests
-          command: npm test --passWithNoTests
-  build-node:
-    # Build node project
-    executor: node/default
-    steps:
-      - checkout
-      - node/install-packages:
-          pkg-manager: npm
-      - run:
-          command: npm run build
-      - run:
-          name: Create the ~/artifacts directory if it doesn't exist
-          command: mkdir -p ~/artifacts
-      # Copy output to artifacts dir
-      - run:
-          name: Copy artifacts
-          command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
-      - store_artifacts:
-          path: ~/artifacts
-          destination: node-build
-  deploy:
-    # This is an example deploy job, not actually used by the workflow
+
+executors:
+  node-executor:
     docker:
-      - image: cimg/base:stable
+      - image: circleci/node:18.16  # Use a compatible Node.js image
+    working_directory: ~/project
+
+jobs:
+  install_dependencies:
+    executor: node-executor
     steps:
-      # Replace this with steps to deploy to users
+      - checkout
       - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
+          name: Install Dependencies
+          command: npm install
+
+  test:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Run Tests with Jest
+          command: npm run test -- --watch=false --no-progress
+
+  build:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Build Angular Project
+          command: npm run build -- --configuration production
+      - persist_to_workspace:
+          root: dist
+          paths:
+            - .
+
+  deploy:
+    docker:
+      - image: atmoz/sftp  # Minimal SFTP Docker image
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+      - run:
+          name: Deploy via SFTP
+          command: |
+            apk add openssh-client  # Install SSH client
+            scp -r ~/workspace/* username@your-server-ip:/path/to/deployment
+
 workflows:
-  build-and-test:
+  version: 2
+  test_build_deploy:
     jobs:
-      - test-node
-      - build-node:
+      - install_dependencies
+      - test:
           requires:
-            - test-node
-    # - deploy:
-    #     requires:
-    #       - build-node
+            - install_dependencies
+      - build:
+          requires:
+            - test
+      - deploy:
+          requires:
+            - build
+
