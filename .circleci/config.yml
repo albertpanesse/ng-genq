@@ -58,13 +58,13 @@ workflows:
   version: 2
   test_build_deploy:
     jobs:
-      - install_dependencies
-      - test:
+      - install_angular_cli
+      - install_dependencies:
           requires:
-            - install_dependencies
+            - install_angular_cli
       - build:
           requires:
-            - test
+            - install_dependencies
       - deploy:
           requires:
             - build
