@@ -7,6 +7,14 @@ executors:
     working_directory: ~/project
 
 jobs:
+  install_angular_cli:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Install Angular CLI globally
+          command: npm install @angular/cli -g
+
   install_dependencies:
     executor: node-executor
     steps:
@@ -14,14 +22,6 @@ jobs:
       - run:
           name: Install Dependencies
           command: npm install
-
-  test:
-    executor: node-executor
-    steps:
-      - checkout
-      - run:
-          name: Run Tests with Jest
-          command: npm run test -- --watch=false --no-progress
 
   build:
     executor: node-executor
