@@ -44,6 +44,8 @@
     "@ngx-translate/core": "^16.0.3",
     "@ngx-translate/http-loader": "^16.0.0",
     "chart.js": "^4.4.6",
+    "gridstack": "^11.1.2",
+    "leader-line": "^1.0.7",
     "lodash-es": "^4.17.21",
     "monaco-editor": "^0.52.2",
     "ngx-scrollbar": "^13.0.3",

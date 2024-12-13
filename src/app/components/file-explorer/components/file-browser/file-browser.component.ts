@@ -22,6 +22,7 @@ export class FileBrowserComponent implements OnChanges {
 
   filteredItems: ITreeItem[] = [];
   isCreateDirDialogVisible: boolean = false;
+  isPreviewModalVisible: boolean = false;
   fileContent: string = '';
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -50,5 +51,11 @@ export class FileBrowserComponent implements OnChanges {
           this.fileContent = fileContent;
         });
     }
+
+    this.isPreviewModalVisible = true;
+  }
+
+  handlerOnVisibleChange = (visible: boolean) => {
+    this.isPreviewModalVisible = visible;
   }
 }

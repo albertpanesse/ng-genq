@@ -1,4 +1,4 @@
-import { Component, Input } from "@angular/core";
+import { Component, EventEmitter, Input, Output } from "@angular/core";
 import {
   ButtonCloseDirective,
   ModalBodyComponent,
@@ -30,9 +30,15 @@ export class FileViewerModalComponent {
   @Input() fileContent: string = '';
   @Input() visible: boolean = false;
 
+  @Output() onVisibleChange: EventEmitter<boolean> = new EventEmitter();
+
   editorOptions = {
     theme: 'vs-dark',
     language: 'javascript',
     automaticLayout: true,
+  }
+
+  handlerOnVisibleChange = (visible: boolean) => {
+    this.onVisibleChange.emit(visible);
   }
 }

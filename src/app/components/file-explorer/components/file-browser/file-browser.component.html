@@ -11,4 +11,4 @@
   <create-dir-dialog-comp [visible]="isCreateDirDialogVisible" (closed)="handlerOnCreateDirDialogClosed()" />
 </div>
 
-<file-viewer-modal-comp [visible]="!!fileContent" [fileContent]="fileContent" />
+<file-viewer-modal-comp [visible]="isPreviewModalVisible" [fileContent]="fileContent" (onVisibleChange)="handlerOnVisibleChange($event)" />

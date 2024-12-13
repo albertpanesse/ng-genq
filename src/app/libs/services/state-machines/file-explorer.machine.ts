@@ -5,7 +5,7 @@ import { ApiService, CommonService, EAlertType, IAlert } from "..";
 import { IRootContext } from ".";
 import { IGlobalState } from "../../store";
 import { Store } from "@ngrx/store";
-import { setFileDirListAction } from "../../store/actions";
+import { setFileContentAction, setFileDirListAction } from "../../store/actions";
 
 export interface IStateFileExplorerServices {
   apiService: ApiService;
@@ -179,8 +179,8 @@ export const fileExplorerStateMachine = setup({
               ({ context, event }) => {
                 const apiResponse = event.output;
                 if (apiResponse?.success) {
-                  const fileDirList = (apiResponse as ICommonFunctionResult<TFileExplorerPreviewingResponsePayload>).functionResult;
-                  // NO CALLBACK, JUST DISPATCH TO STORE
+                  const fileContent = (apiResponse as ICommonFunctionResult<TFileExplorerPreviewingResponsePayload>).functionResult;
+                  context.services.store.dispatch(setFileContentAction({ fileContent }));
                 } else {
                   context.context.isError = true;
                   context.context.errorDetails = (apiResponse as ICommonFunctionResult<IErrorResponsePayload>).functionResult;
@@ -201,7 +201,11 @@ export const fileExplorerStateMachine = setup({
           },
         ],
       },
-      state_previewingError: {},
+      state_previewingError: {
+        entry: [{ type: 'action_showAlert' }],
+        always: [{ target: 'state_idle' }],
+        exit: [{ type: 'action_resetError' }],
+      },
       state_previewingSuccess: {
         always: [{ target: 'state_idle' }],
       },
