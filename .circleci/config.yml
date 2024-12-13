@@ -7,29 +7,18 @@ executors:
     working_directory: ~/project
 
 jobs:
-  install_angular_cli:
-    executor: node-executor
-    steps:
-      - checkout
-      - run:
-          name: Install Angular CLI globally
-          command: npm install @angular/cli -g
-
-  install_dependencies:
-    executor: node-executor
-    steps:
-      - checkout
-      - run:
-          name: Install Dependencies
-          command: npm install
-
   build:
     executor: node-executor
     steps:
       - checkout
       - run:
+          name: Install Angular CLI and Dependencies
+          command: |
+            npm install -g @angular/cli
+            npm install
+      - run:
           name: Build Angular Project
-          command: npm run build -- --configuration production
+          command: ng build --configuration production
       - persist_to_workspace:
           root: dist
           paths:
@@ -37,7 +26,7 @@ jobs:
 
   deploy:
     docker:
-      - image: atmoz/sftp  # Minimal SFTP Docker image
+      - image: atmoz/sftp
     steps:
       - attach_workspace:
           at: ~/workspace
@@ -47,7 +36,7 @@ jobs:
             mkdir -p ~/.ssh
             echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
-            ssh-keyscan -H $SFTP_HOST >> ~/.ssh/known_hosts  # To avoid SSH asking to confirm the server
+            ssh-keyscan -H $SFTP_HOST >> ~/.ssh/known_hosts  # Avoid SSH confirmation
       - run:
           name: Deploy via SFTP
           command: |
@@ -58,14 +47,7 @@ workflows:
   version: 2
   test_build_deploy:
     jobs:
-      - install_angular_cli
-      - install_dependencies:
-          requires:
-            - install_angular_cli
-      - build:
-          requires:
-            - install_dependencies
+      - build
       - deploy:
           requires:
             - build
-
