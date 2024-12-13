@@ -42,10 +42,17 @@ jobs:
       - attach_workspace:
           at: ~/workspace
       - run:
+          name: Add SSH key to agent
+          command: |
+            mkdir -p ~/.ssh
+            echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+            ssh-keyscan -H $SFTP_HOST >> ~/.ssh/known_hosts  # To avoid SSH asking to confirm the server
+      - run:
           name: Deploy via SFTP
           command: |
             apk add openssh-client  # Install SSH client
-            scp -r ~/workspace/* username@your-server-ip:/path/to/deployment
+            scp -r ~/workspace/* albert@103.127.138.209:/home/albert/www/genq
 
 workflows:
   version: 2
