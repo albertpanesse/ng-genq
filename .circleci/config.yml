@@ -38,7 +38,7 @@ jobs:
           name: Add SSH Key to Agent
           command: |
             mkdir -p ~/.ssh
-            # echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+            echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
             # chmod 600 ~/.ssh/id_rsa
             # ssh-keyscan -H $SFTP_HOST >> ~/.ssh/known_hosts
       # - run:
@@ -49,15 +49,15 @@ workflows:
   version: 2
   test_build_deploy:
     jobs:
-      - build:
-          filters:
-            branches:
-              only:
-                - master
-                - dev
+      # - build:
+      #     filters:
+      #       branches:
+      #         only:
+      #           - master
+      #           - dev
       - deploy:
-          requires:
-            - build
+          # requires:
+          #   - build
           filters:
             branches:
               only:
