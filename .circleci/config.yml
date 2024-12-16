@@ -52,6 +52,7 @@ workflows:
             branches:
               only:
                 - master
+                - dev
       - deploy:
           requires:
             - build
@@ -59,3 +60,4 @@ workflows:
             branches:
               only:
                 - master
+                - dev
