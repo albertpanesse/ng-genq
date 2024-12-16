@@ -33,7 +33,7 @@ jobs:
       - run:
           name: Install Required Tools
           command: |
-            apt-get update && apt-get install -y openssh-client
+            apt-get update && apt-get install -y openssh-client zip
       - run:
           name: Add SSH Key to Agent
           command: |
@@ -42,8 +42,18 @@ jobs:
             chmod 600 ~/.ssh/id_rsa
             ssh-keyscan -H -p 11200 $SFTP_HOST >> ~/.ssh/known_hosts
       - run:
-          name: Deploy via SFTP
-          command: scp -P 11200 -r ~/workspace/* albert@103.127.138.209:/home/albert/www/genq
+          name: Create ZIP File
+          command: |
+            cd ~/workspace
+            zip -r deployment.zip .  # Create a zip file of all workspace contents
+      - run:
+          name: Upload ZIP File
+          command: |
+            scp -P 11200 ~/workspace/deployment.zip albert@103.127.138.209:/home/albert/www/genq
+      - run:
+          name: Extract on Remote Server
+          command: |
+            ssh -p 11200 albert@103.127.138.209 "unzip -o /home/albert/www/genq/deployment.zip -d /home/albert/www/genq && rm /home/albert/www/genq/deployment.zip"
 
 workflows:
   version: 2
