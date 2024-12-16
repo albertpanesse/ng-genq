@@ -49,11 +49,11 @@ jobs:
       - run:
           name: Upload ZIP File
           command: |
-            scp -P 11200 ~/workspace/deployment.zip albert@103.127.138.209:/home/albert/www/genq
+            scp -P 11200 ~/workspace/deployment.zip albert@103.127.138.209:/home/albert/www
       - run:
           name: Extract on Remote Server
           command: |
-            ssh -p 11200 albert@103.127.138.209 "unzip -o /home/albert/www/genq/deployment.zip -d /home/albert/www/genq && rm /home/albert/www/genq/deployment.zip"
+            ssh -p 11200 albert@103.127.138.209 "unzip -o /home/albert/www/deployment.zip -d /home/albert/www && rm /home/albert/www/deployment.zip"
 
 workflows:
   version: 2
