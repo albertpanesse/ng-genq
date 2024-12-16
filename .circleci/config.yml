@@ -47,7 +47,11 @@ workflows:
   version: 2
   test_build_deploy:
     jobs:
-      - build
+      - build:
+          filters:
+            branches:
+              only:
+                - master
       - deploy:
           requires:
             - build
