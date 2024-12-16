@@ -1,0 +1,61 @@
+version: 2.1
+
+executors:
+  node-executor:
+    docker:
+      - image: node:20-alpine
+    working_directory: ~/project
+
+jobs:
+  build:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Install Angular CLI and Dependencies
+          command: |
+            npm install -g @angular/cli
+            npm install
+      - run:
+          name: Build Angular Project
+          command: ng build --configuration production
+      - persist_to_workspace:
+          root: dist
+          paths:
+            - .
+
+  deploy:
+    docker:
+      - image: atmoz/sftp
+    steps:
+      - attach_workspace:
+          at: ~/workspace
+      - run:
+          name: Add SSH key to agent
+          command: |
+            mkdir -p ~/.ssh
+            echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+            ssh-keyscan -H $SFTP_HOST >> ~/.ssh/known_hosts  # Avoid SSH confirmation
+      - run:
+          name: Deploy via SFTP
+          command: |
+            apk add openssh-client  # Install SSH client
+            scp -r ~/workspace/* albert@103.127.138.209:/home/albert/www/genq
+
+workflows:
+  version: 2
+  test_build_deploy:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only:
+                - master
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master

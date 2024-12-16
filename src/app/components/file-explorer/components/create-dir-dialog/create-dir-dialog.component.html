@@ -1,0 +1,19 @@
+<c-modal id="liveDemoModal" [visible]="visible">
+  <c-modal-header>
+    <h5 cModalTitle>{{ 'CREATE_NEW_DIR' | translate }}</h5>
+    <button (click)="close()" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <form cForm>
+      <div class="mb-3">
+        <label cLabel for="dirName">Directory Name</label>
+        <input cFormControl id="dirName" type="text">
+        <div cFormText>Fill in directory name</div>
+      </div>
+    </form>
+  </c-modal-body>
+  <c-modal-footer>
+    <button (click)="close()" cButton color="secondary">Close</button>
+    <button cButton color="primary">Save</button>
+  </c-modal-footer>
+</c-modal>

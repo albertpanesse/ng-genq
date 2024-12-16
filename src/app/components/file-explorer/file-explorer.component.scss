@@ -1,0 +1,34 @@
+.file-explorer-main-wrapper {
+  display: flex;
+  flex-direction: column;
+
+  .file-explorer-buttons {
+    display: flex;
+    flex-direction: row;
+
+    margin-bottom: 30px;
+  }
+
+  .file-explorer-wrapper {
+    display: flex;
+    flex-direction: row;
+
+    .file-explorer-filetree {
+      display: block;
+      flex: 1;
+
+      border: 1px solid #dfdfdf;
+      padding: 5px;
+
+      overflow: scroll;
+    }  
+
+    .file-explorer-browser {
+      display: block;
+      flex: 3;
+
+      border: 1px solid #dfdfdf;
+      padding: 5px;
+    }
+  }
+}

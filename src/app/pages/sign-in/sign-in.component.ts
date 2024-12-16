@@ -1,0 +1,87 @@
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { NgStyle } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { IconDirective } from '@coreui/icons-angular';
+import { 
+  ContainerComponent,
+  RowComponent,
+  ColComponent,
+  CardGroupComponent,
+  TextColorDirective,
+  CardComponent,
+  CardBodyComponent,
+  FormDirective,
+  InputGroupComponent,
+  InputGroupTextDirective,
+  FormControlDirective,
+  ButtonDirective,
+} from '@coreui/angular';
+
+import { AuthService } from '../../libs/services/auth.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CommonService } from 'src/app/libs/services';
+import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { IGlobalState } from '../../libs/store';
+import { isUserLoggedInSelector } from '../../libs/store/selectors';
+
+@Component({
+  selector: 'sign-in-comp',
+    templateUrl: './sign-in.component.html',
+    styleUrls: ['./sign-in.component.scss'],
+    standalone: true,
+    imports: [
+      ContainerComponent,
+      RowComponent,
+      ReactiveFormsModule,
+      ColComponent,
+      CardGroupComponent,
+      TextColorDirective,
+      CardComponent,
+      CardBodyComponent,
+      FormDirective,
+      InputGroupComponent,
+      InputGroupTextDirective,
+      IconDirective,
+      FormControlDirective,
+      ButtonDirective,
+      NgStyle,
+    ]
+})
+export class SignInComponent implements OnInit {
+
+  readonly #destroyRef: DestroyRef = inject(DestroyRef);
+
+  signInForm!: FormGroup;
+
+  constructor(
+    private authService: AuthService, 
+    private commonService: CommonService, 
+    private router: Router, 
+    private store: Store<IGlobalState>, 
+    private formBuilder: FormBuilder
+  ) {
+    this.signInForm = this.formBuilder.group({
+      username: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]],
+    });
+  }
+  
+  ngOnInit(): void {
+    this.store.select(isUserLoggedInSelector)
+      .pipe(takeUntilDestroyed(this.#destroyRef))
+      .subscribe((isUserLoggedIn: boolean) => {
+        if (isUserLoggedIn) {
+          this.router.navigate(['/-/dsb']);
+        }
+      });
+
+    this.commonService.setLoader(false);
+  }
+
+  handlerOnSubmit = () => {
+    if (this.signInForm.valid) {
+      this.authService.signIn(this.signInForm.value);  
+    }
+  }
+}

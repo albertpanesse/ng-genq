@@ -1,0 +1,35 @@
+.file-browser-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .file-browser-item-container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+  
+    .file-browser-item {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      width: 128px;
+      height: 128px;
+      background-image: url(../../../../../assets/images/file.png);
+      background-size: 60%;
+      background-position: 10px 10px;
+      background-repeat: no-repeat;
+      padding: 10px;
+      cursor: pointer;
+      
+      &:hover {
+        background-color: grey;
+      }
+    }  
+  }
+
+  .file-browser-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+  }
+}

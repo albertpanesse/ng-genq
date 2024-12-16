@@ -1,0 +1,13 @@
+<div class="file-explorer-main-wrapper">
+  <div class="file-explorer-buttons">
+    <button cButton variant="outline" title="File Upload"><svg [cIcon]="icons.cilArrowThickFromBottom" width="16"></svg></button>
+  </div>
+  <div class="file-explorer-wrapper">
+    <div class="file-explorer-filetree">
+      <directory-tree-comp [items]="items" [currentItem]="currentItem" (onDirectorySelected)="handlerOnDirectorySelected($event)" />
+    </div>
+    <div class="file-explorer-browser">
+      <file-browser-comp [actions]="actions" [items]="currentItem?.fileItem?.children" />
+    </div>  
+  </div>
+</div>

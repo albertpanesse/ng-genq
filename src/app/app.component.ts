@@ -7,15 +7,22 @@ import { delay, filter, map, tap } from 'rxjs/operators';
 import { ColorModeService } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from './icons/icon-subset';
+import { AlertComponent, LoaderComponent } from "./components";
+import { CommonService, IAlert } from "./libs/services";
+import { TranslateService } from '@ngx-translate/core';
+import { Store } from '@ngrx/store';
+import { IGlobalState } from './libs/store';
 
 @Component({
   selector: 'app-root',
-  template: '<router-outlet />',
+  template: '<router-outlet /><alert-comp [alerts]="alerts" /><loader-comp [showLoader]="showLoader" />',
   standalone: true,
-  imports: [RouterOutlet]
+  imports: [RouterOutlet, AlertComponent, LoaderComponent]
 })
 export class AppComponent implements OnInit {
-  title = 'CoreUI Angular Admin Template';
+  title = 'GenQ - General Query';
+  alerts: IAlert[] = [];
+  showLoader: boolean = true;
 
   readonly #destroyRef: DestroyRef = inject(DestroyRef);
   readonly #activatedRoute: ActivatedRoute = inject(ActivatedRoute);
@@ -25,15 +32,32 @@ export class AppComponent implements OnInit {
   readonly #colorModeService = inject(ColorModeService);
   readonly #iconSetService = inject(IconSetService);
 
-  constructor() {
+  constructor(private commonService: CommonService, private store: Store<IGlobalState>, private translate: TranslateService) {
     this.#titleService.setTitle(this.title);
     // iconSet singleton
     this.#iconSetService.icons = { ...iconSubset };
     this.#colorModeService.localStorageItemName.set('coreui-free-angular-admin-template-theme-default');
     this.#colorModeService.eventName.set('ColorSchemeChange');
+
+    this.translate.addLangs(['en', 'id', 'ar', 'fr']);
+    this.translate.setDefaultLang('en');
+    this.translate.use('en');
+
+    this.commonService.getLoaderSubject()
+    .pipe(takeUntilDestroyed(this.#destroyRef))
+    .subscribe((isLoading: boolean) => {
+      this.showLoader = isLoading;
+    });
   }
 
   ngOnInit(): void {
+    this.commonService.getAlertSubject()
+      .pipe(takeUntilDestroyed(this.#destroyRef))
+      .subscribe((alerts: IAlert[]) => {
+        if (alerts && alerts.length > 0) {
+          this.alerts = alerts;
+        }
+      });
 
     this.#router.events.pipe(
         takeUntilDestroyed(this.#destroyRef)
@@ -53,6 +77,6 @@ export class AppComponent implements OnInit {
         }),
         takeUntilDestroyed(this.#destroyRef)
       )
-      .subscribe();
+      .subscribe();    
   }
 }

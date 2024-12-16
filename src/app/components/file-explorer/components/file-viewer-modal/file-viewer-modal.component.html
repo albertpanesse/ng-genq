@@ -1,0 +1,9 @@
+<c-modal [visible]="visible" alignment="center" size="lg" (visibleChange)="handlerOnVisibleChange($event)">
+  <c-modal-header>
+    <h5 cModalTitle>Modal title</h5>
+    <button cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <textarea cols="100" role="50">{{ fileContent }}</textarea>
+  </c-modal-body>
+</c-modal>

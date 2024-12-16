@@ -1,0 +1,14 @@
+<div class="file-browser-wrapper">
+  <div class="file-browser-item-container" *ngIf="filteredItems.length > 0">
+    <div class="file-browser-item" *ngFor="let item of filteredItems; let idx = index" (click)="handlerOnFileClick(item)">
+      {{ item.fileItem.title }}
+    </div>
+  </div>
+  <div *ngIf="filteredItems.length == 0">No Files</div>
+  <div class="file-browser-actions">
+    <button (click)="handlerOnCreateDir()">Create Dir</button>
+  </div>
+  <create-dir-dialog-comp [visible]="isCreateDirDialogVisible" (closed)="handlerOnCreateDirDialogClosed()" />
+</div>
+
+<file-viewer-modal-comp [visible]="isPreviewModalVisible" [fileContent]="fileContent" (onVisibleChange)="handlerOnVisibleChange($event)" />

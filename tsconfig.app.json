@@ -8,7 +8,7 @@
     ],
     "paths": {
       "@docs-components/*": [
-        "./src/components/*"
+        "src/old-refs/components/*"
       ]
     }
   },
