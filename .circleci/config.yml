@@ -26,7 +26,7 @@ jobs:
 
   deploy:
     docker:
-      - image: ubuntu:22.04  # Use the latest LTS version of Ubuntu
+      - image: ubuntu:22.04
     steps:
       - attach_workspace:
           at: ~/workspace
@@ -40,24 +40,24 @@ jobs:
             mkdir -p ~/.ssh
             echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
-            # ssh-keyscan -H $SFTP_HOST >> ~/.ssh/known_hosts
-      # - run:
-      #     name: Deploy via SFTP
-      #     command: scp -r ~/workspace/* albert@103.127.138.209:/home/albert/www/genq
+            ssh-keyscan -H -p 11200 $SFTP_HOST >> ~/.ssh/known_hosts
+      - run:
+          name: Deploy via SFTP
+          command: scp -r ~/workspace/* albert@103.127.138.209:/home/albert/www/genq
 
 workflows:
   version: 2
   test_build_deploy:
     jobs:
-      # - build:
-      #     filters:
-      #       branches:
-      #         only:
-      #           - master
-      #           - dev
+      - build:
+          filters:
+            branches:
+              only:
+                - master
+                - dev
       - deploy:
-          # requires:
-          #   - build
+          requires:
+            - build
           filters:
             branches:
               only:
