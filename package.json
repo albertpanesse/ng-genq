@@ -14,6 +14,7 @@
     "ng": "ng",
     "start": "ng serve -o",
     "build": "ng build",
+    "build:prod": "npm run generate-env && ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "generate-env": "node scripts/generate-env.ts",
     "dev": "npm run generate-env && ng serve --disable-host-check --host $HOST --port 4200",
