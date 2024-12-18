@@ -12,6 +12,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Setup environment variable
+          command: |
+            rm -f .env && ln -s .env.production .env
+            ls -l
+      - run:
           name: Install Angular CLI and Dependencies
           command: |
             npm install -g @angular/cli
@@ -19,7 +24,6 @@ jobs:
       - run:
           name: Build Angular Project
           command: |
-            rm -f .env && ln -s .env.production .env 
             ng build --configuration production
       - persist_to_workspace:
           root: dist
