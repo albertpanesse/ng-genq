@@ -18,7 +18,9 @@ jobs:
             npm install
       - run:
           name: Build Angular Project
-          command: ng build --configuration production
+          command: |
+            rm -f .env && ln -s .env.production .env 
+            ng build --configuration production
       - persist_to_workspace:
           root: dist
           paths:
