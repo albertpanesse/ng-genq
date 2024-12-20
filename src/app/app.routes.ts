@@ -14,11 +14,15 @@ export const routes: Routes = [
     children: [
       {
         path: 'sign-in',
-        loadChildren: () => import('./pages/sign-in/routes').then((m) => m.routes)
+        loadChildren: () => import('./pages/sign-in/routes').then((m) => m.routes),
       },
       {
         path: 'register',
-        loadChildren: () => import('./pages/register/routes').then((m) => m.routes)
+        loadChildren: () => import('./pages/register/routes').then((m) => m.routes),
+      },
+      {
+        path: 'test',
+        loadChildren: () => import('./pages/test/routes').then((m) => m.routes),
       }
     ]
   },

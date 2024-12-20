@@ -1,13 +1,15 @@
 import { Component, OnInit } from "@angular/core";
 import { CommonService } from "../../libs/services";
+import { EchartComponent } from "../../components/echart/echart.component";
 
 @Component({
-  selector: 'dashboard-comp',
-  templateUrl: 'dashboard.component.html',
-  styleUrls: ['dashboard.component.scss'],
+  selector: 'test-comp',
+  templateUrl: 'test.component.html',
+  styleUrls: ['test.component.scss'],
   standalone: true,
+  imports: [EchartComponent],
 })
-export class DashboardComponent implements OnInit {
+export class TestComponent implements OnInit {
   
   constructor(private commonService: CommonService) {}
 
