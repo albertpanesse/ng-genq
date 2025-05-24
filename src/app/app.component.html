@@ -1,0 +1,5 @@
+<router-outlet />
+<div class="toaster-wrapper" *ngFor="let alert of alerts">
+  <alert-comp *ngIf="!!alert" [alert]="alert" />
+</div>
+<loader-comp [showLoader]="showLoader" />

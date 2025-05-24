@@ -2,7 +2,7 @@
   <div *ngFor="let item of items | isDir">
     <ng-container *ngTemplateOutlet="directoryItem; context: { item }"></ng-container>
   </div>
-  <create-dir-dialog-comp [visible]="isCreateDirDialogVisible" (closed)="handlerOnCreateDirDialogClosed()" />
+  <create-dir-dialog-comp [visible]="isCreateDirDialogVisible" (saved)="handlerOnCreateDirDialogSaved($event)" (closed)="handlerOnCreateDirDialogClosed()" />
 </div>
 
 <ng-template #directoryItem let-item="item">

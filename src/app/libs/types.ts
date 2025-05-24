@@ -9,12 +9,14 @@ export interface IAuthSigningInResponsePayload {
 }
 
 export interface IUserFile {
+  createdAt: string;
+  fileName: string;
   id: number;
-  userId: number;
-  title: string;
   isDir: boolean;
   parentId: number;
-  fileName: string;
+  title: string;
+  updatedAt: string;
+  userId: number;
 }
 
 export type TFileExplorerListingResponsePayload = IUserFile[];
@@ -38,11 +40,6 @@ export interface IErrorResponsePayload {
 export interface ICommonFunctionResult<T> {
   success: boolean;
   functionResult: T;
-}
-
-export interface IAuthCredential {
-  username: string;
-  password: string;
 }
 
 export enum EError {

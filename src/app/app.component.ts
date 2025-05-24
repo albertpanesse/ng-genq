@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
@@ -15,9 +16,9 @@ import { IGlobalState } from './libs/store';
 
 @Component({
   selector: 'app-root',
-  template: '<router-outlet /><alert-comp [alerts]="alerts" /><loader-comp [showLoader]="showLoader" />',
+  templateUrl: './app.component.html',
   standalone: true,
-  imports: [RouterOutlet, AlertComponent, LoaderComponent]
+  imports: [CommonModule, RouterOutlet, AlertComponent, LoaderComponent],
 })
 export class AppComponent implements OnInit {
   title = 'GenQ - General Query';
@@ -44,10 +45,10 @@ export class AppComponent implements OnInit {
     this.translate.use('en');
 
     this.commonService.getLoaderSubject()
-    .pipe(takeUntilDestroyed(this.#destroyRef))
-    .subscribe((isLoading: boolean) => {
-      this.showLoader = isLoading;
-    });
+      .pipe(takeUntilDestroyed(this.#destroyRef))
+      .subscribe((isLoading: boolean) => {
+        this.showLoader = isLoading;
+      });
   }
 
   ngOnInit(): void {
@@ -55,6 +56,7 @@ export class AppComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.#destroyRef))
       .subscribe((alerts: IAlert[]) => {
         if (alerts && alerts.length > 0) {
+          console.log('alerts', alerts);
           this.alerts = alerts;
         }
       });

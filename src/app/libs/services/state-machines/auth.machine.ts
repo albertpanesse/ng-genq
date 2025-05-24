@@ -1,13 +1,13 @@
 import { assign, fromPromise, setup } from "xstate";
 import { Store } from "@ngrx/store";
 
-import { IUser } from "../../models";
 import { signingIn } from "../apis";
 import { IAuthSigningInResponsePayload, ICommonFunctionResult, IErrorResponsePayload } from "../../types";
 import { ApiService, CommonService, EAlertType, IAlert } from "../";
 import { IRootContext } from ".";
 import { IGlobalState } from "../../store";
 import { setIsUserLoggedInAction, setTokensAction } from "../../store/actions";
+import { IAuthDTO } from "../../dtos";
 
 export interface IStateAuthServices {
   apiService: ApiService;
@@ -16,7 +16,7 @@ export interface IStateAuthServices {
 }
 
 export interface IStateAuthContext {
-  credential: TEventAuthSigningInParams;
+  authDTO: IAuthDTO;
   isAuthError: boolean;
   authError: IErrorResponsePayload;
 };
@@ -26,15 +26,10 @@ interface IStateAuthEvent<T1, T2 = void> {
   params?: T2;
 };
 
-type TEventAuthSigningInParams = {
-  username: string;
-  password: string;
-}
-
 export const authStateMachine = setup({
   types: {
     context: {} as IRootContext<IStateAuthServices, IStateAuthContext>,
-    events: {} as IStateAuthEvent<'event_signingIn', TEventAuthSigningInParams> | IStateAuthEvent<'event_signingOut'>,
+    events: {} as IStateAuthEvent<'event_signingIn', IAuthDTO> | IStateAuthEvent<'event_signingOut'>,
   },
   actions: {
     action_resetError: assign({
@@ -45,14 +40,17 @@ export const authStateMachine = setup({
     }),
     action_resetCredential: assign({
       context: {
-        credential: {} as TEventAuthSigningInParams,
+        authDTO: {} as IAuthDTO,
       } as IStateAuthContext,
     }),
     action_showAuthErrorAlert: ({ context }) => {
+      context.services.commonService.setLoader(false);
+
       context.services.commonService.setAlert({
         type: EAlertType.AT_ERROR,
         title: 'Authentication Error',
         message: context.context.authError.message,
+        triggered: false,
       } as IAlert);
     },
   },
@@ -72,7 +70,7 @@ export const authStateMachine = setup({
         store: input.services.store,
       },
       context: {
-        credential: {} as TEventAuthSigningInParams,
+        authDTO: {} as IAuthDTO,
         isAuthError: false,
         authError: {} as IErrorResponsePayload,
       },
@@ -86,7 +84,7 @@ export const authStateMachine = setup({
             actions: [
               assign({
                 context: ({ event }) => ({
-                  credential: event.params as TEventAuthSigningInParams,
+                  authDTO: event.params as IAuthDTO,
                 } as IStateAuthContext),
               }),
             ],
@@ -100,14 +98,14 @@ export const authStateMachine = setup({
         entry: [({ context }) => context.services.commonService.setLoader(true)],
         invoke: {
           src: 'actor_signingIn',
-          input: ({ context: { services: { apiService }, context: { credential } } }) => ({ apiService, credential }),
+          input: ({ context: { services: { apiService }, context: { authDTO } } }) => ({ apiService, authDTO }),
           onDone: {
             target: 'state_afterSigningIn',
             actions: [
               { type: 'action_resetError' },
               ({ context, event }) => {
                 const authApiResponse = event.output;
-                context.context.credential = {} as TEventAuthSigningInParams;
+                context.context.authDTO = {} as IAuthDTO;
                 if (authApiResponse?.success) {
                   const { accessToken, refreshToken } = (authApiResponse as ICommonFunctionResult<IAuthSigningInResponsePayload>).functionResult;
                   context.services.store.dispatch(setIsUserLoggedInAction({ isUserLoggedIn: true }));

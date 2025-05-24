@@ -6,7 +6,7 @@ import { Subject } from "rxjs";
 import { IUserFile } from "../types";
 import { IGlobalState } from "../store";
 import { Store } from "@ngrx/store";
-import { TFileExplorerActionParams } from "src/app/components/file-explorer/libs";
+import { TFileExplorerActionParams } from "../../components/file-explorer/libs";
 
 @Injectable({
   providedIn: 'root',

@@ -6,6 +6,7 @@ import { IRootContext } from ".";
 import { IGlobalState } from "../../store";
 import { Store } from "@ngrx/store";
 import { setFileContentAction, setFileDirListAction } from "../../store/actions";
+import { ICreateDirDTO } from "../../dtos";
 
 export interface IStateFileExplorerServices {
   apiService: ApiService;
@@ -14,7 +15,7 @@ export interface IStateFileExplorerServices {
 }
 
 export interface IStateFileExplorerContext {
-  dirName: string;
+  createDirDTO: ICreateDirDTO;
   params: {
     previewing: IEventFileExplorerPreviewingParams;
   };
@@ -29,10 +30,6 @@ interface IStateFileExplorerEvent<T1, T2 = void> {
 
 interface IEventFileExplorerUploadingParams {}
 
-interface IEventFileExplorerCreatingParams {
-  dirName: string;
-}
-
 interface IEventFileExplorerMovingParams {}
 
 interface IEventFileExplorerDeletingParams {}
@@ -46,8 +43,8 @@ export const fileExplorerStateMachine = setup({
   types: {
     context: {} as IRootContext<IStateFileExplorerServices, IStateFileExplorerContext>,
     events: {} as IStateFileExplorerEvent<'event_listing'> | 
+      IStateFileExplorerEvent<'event_creating', ICreateDirDTO> | 
       IStateFileExplorerEvent<'event_uploading', IEventFileExplorerUploadingParams> | 
-      IStateFileExplorerEvent<'event_creating', IEventFileExplorerCreatingParams> | 
       IStateFileExplorerEvent<'event_moving', IEventFileExplorerMovingParams> | 
       IStateFileExplorerEvent<'event_deleting', IEventFileExplorerDeletingParams> |
       IStateFileExplorerEvent<'event_previewing', IEventFileExplorerPreviewingParams>,
@@ -88,7 +85,7 @@ export const fileExplorerStateMachine = setup({
         store: input.services.store,
       },
       context: {
-        dirName: '',
+        createDirDTO: {} as ICreateDirDTO,
         params: {
           previewing: {
             userFileId: -1,
@@ -110,7 +107,7 @@ export const fileExplorerStateMachine = setup({
             target: 'state_creating',
             actions: assign({
               context: ({ event }) => ({
-                dirName: event.params?.dirName,
+                createDirDTO: event.params as ICreateDirDTO,
               } as IStateFileExplorerContext),
             }),
           },
@@ -167,7 +164,46 @@ export const fileExplorerStateMachine = setup({
       state_listingSuccess: {
         always: [{ target: 'state_idle' }],
       },
-      state_creating: {},
+      state_creating: {
+        invoke: {
+          src: 'actor_creating',
+          input: ({ context: { services: { apiService }, context: { createDirDTO } } }) => ({ apiService, createDirDTO }),
+          onDone: {
+            target: 'state_afterCreating',
+            actions: [
+              { type: 'action_resetError' },
+              ({ context, event }) => {
+                const apiResponse = event.output;
+                if (apiResponse?.success) {
+                } else {
+                  context.context.isError = true;
+                  context.context.errorDetails = (apiResponse as ICommonFunctionResult<IErrorResponsePayload>).functionResult;
+                }
+              },
+            ],
+          },
+        },
+      },
+      state_afterCreating: {
+        always: [
+          {
+            guard: 'guard_isError',
+            target: 'state_creatingError',
+          },
+          {
+            target: 'state_creatingSuccess',
+          },
+        ],
+      },
+      state_creatingError: {
+        entry: [{ type: 'action_showAlert' }],
+        always: [{ target: 'state_idle' }],
+        exit: [{ type: 'action_resetError' }],
+      },
+      state_creatingSuccess: {
+        entry: [{ type: 'action_showAlert' }],
+        always: [{ target: 'state_idle' }],
+      },
       state_previewing: {
         invoke: {
           src: 'actor_previewing',

@@ -19,7 +19,7 @@ import {
 
 import { AuthService } from '../../libs/services/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CommonService } from 'src/app/libs/services';
+import { CommonService } from '../../libs/services';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { IGlobalState } from '../../libs/store';
@@ -62,7 +62,7 @@ export class SignInComponent implements OnInit {
     private formBuilder: FormBuilder
   ) {
     this.signInForm = this.formBuilder.group({
-      username: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
     });
   }

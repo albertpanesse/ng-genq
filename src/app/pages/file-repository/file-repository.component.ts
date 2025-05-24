@@ -1,14 +1,14 @@
 import { Component, DestroyRef, inject, OnInit } from "@angular/core";
-import { FileExplorerService } from "src/app/libs/services";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { IUserFile } from "src/app/libs/types";
-import { FileExplorerComponent } from "src/app/components/file-explorer/file-explorer.component";
-import { EFileExplorerActions, IFileExplorerActionPreviewParams, ITreeItem, TFileExplorerActionParams, TFileExplorerActionResult } from "src/app/components/file-explorer/libs";
 import { transformUserFilesToTree } from "../../components/file-explorer/libs/transformer";
-import { IGlobalState } from "src/app/libs/store";
 import { Store } from "@ngrx/store";
-import { fileContentSelector, fileDirListSelector } from "src/app/libs/store/selectors";
 import { Observable } from "rxjs";
+import { IGlobalState } from "../../libs/store";
+import { FileExplorerService } from "../../libs/services";
+import { fileContentSelector, fileDirListSelector } from "../../libs/store/selectors";
+import { IUserFile } from "../../libs/types";
+import { FileExplorerComponent } from "../../components/file-explorer/file-explorer.component";
+import { EFileExplorerActions, ITreeItem, TFileExplorerActionParams, TFileExplorerActionResult } from "../../components/file-explorer/libs";
 
 @Component({
   selector: 'file-repository-comp',
