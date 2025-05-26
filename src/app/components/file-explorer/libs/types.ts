@@ -18,13 +18,20 @@ export enum EFileType {
 }
 
 export interface IFileItem {
-  id: string;
-  title: string;
+  createdAt: string;
+  fileName: string;
+  userFileId: number;
   isDir: boolean;
+  parentId: number;
+  title: string;
+  updatedAt: string;
+  userId: number;
+  groupId: string;
+  
+  id: string;
   fileType: EFileType;
   fileSize: number;
   children?: ITreeItem[];
-  lastUpdate: string;  
 }
 
 export interface ITreeItem {
@@ -34,7 +41,7 @@ export interface ITreeItem {
 }
 
 export interface IFileExplorerActionPreviewParams {
-  userFileId: string;
+  userFileId: number;
   numberOfLine: number;
 }
 

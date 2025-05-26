@@ -11,6 +11,7 @@ import { EFileType, ITreeItem } from "../../libs/types";
 import { EContextMenuAction, IsDirPipe } from "../../libs";
 import { CreateDirDialogComponent } from "../create-dir-dialog/create-dir-dialog.component";
 import { FileExplorerService } from "../../../../libs/services";
+import { ICreateDirDTO } from "../../../../libs/dtos";
 
 @Component({
   selector: 'directory-tree-comp',
@@ -74,7 +75,10 @@ export class DirectoryTreeComponent implements OnInit, OnChanges {
   }
 
   handlerOnCreateDirDialogSaved = (dirName: string) => {
-    this.fileExplorerService.create(dirName);
+    this.fileExplorerService.create({
+      name: dirName,
+      parentId: this.currentItem?.fileItem.userFileId || null,
+    } as ICreateDirDTO);
   }
 
   handlerOnCreateDirDialogClosed = () => {
