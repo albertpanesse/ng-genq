@@ -17,7 +17,8 @@
     "build:prod": "npm run generate-env && ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "generate-env": "node scripts/generate-env.ts",
-    "dev": "npm run generate-env && ng serve --disable-host-check --host $HOST --port 4200",
+    "dev:remote": "npm run generate-env && ng serve --disable-host-check --host $HOST --port 4200",
+    "dev:local": "npm run generate-env && npm run start",
     "test": "ng test"
   },
   "private": true,

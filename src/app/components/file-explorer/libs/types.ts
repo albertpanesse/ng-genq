@@ -1,3 +1,6 @@
+import { IFileDirList } from "../../../libs/store";
+import { IUserFile } from "../../../libs/types";
+
 export enum EContextMenuAction {
   CREATE,
   COPY,
@@ -45,11 +48,16 @@ export interface IFileExplorerActionPreviewParams {
   numberOfLine: number;
 }
 
-export type TFileExplorerActionParams = IFileExplorerActionPreviewParams;
+export interface IFileExplorerActionListingParams {
+  userFileId: number;
+}
 
-export type TFileExplorerActionResult = string;
+export type TFileExplorerActionParams = IFileExplorerActionPreviewParams | IFileExplorerActionListingParams;
+
+export type TFileExplorerActionResult = string | IFileDirList;
 
 export enum EFileExplorerActions {
-  FE_PREVIEW,
-  FE_CREATE,
+  FE_LISTING,
+  FE_PREVIEWING,
+  FE_CREATING,
 };

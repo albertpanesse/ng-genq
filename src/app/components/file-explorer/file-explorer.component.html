@@ -4,10 +4,10 @@
   </div>
   <div class="file-explorer-wrapper">
     <div class="file-explorer-filetree">
-      <directory-tree-comp [items]="items" [currentItem]="currentItem" (onDirectorySelected)="handlerOnDirectorySelected($event)" />
+      <directory-tree-comp [actions]="actions" [rootItems]="allItems" [currentItem]="currentItem" (onDirectorySelected)="handlerOnDirectorySelected($event)" />
     </div>
     <div class="file-explorer-browser">
-      <file-browser-comp [actions]="actions" [items]="currentItem?.fileItem?.children" />
+      <file-browser-comp [actions]="actions" [childItems]="currentItem?.fileItem?.children" />
     </div>  
   </div>
 </div>

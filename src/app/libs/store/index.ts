@@ -11,8 +11,13 @@ export interface IAppState {
 
 export interface IUserState extends IUser {}
 
+export interface IFileDirList {
+  parentId: number;
+  userFiles: IUserFile[];
+}
+
 export interface IFileRepoState {
-  fileDirList: IUserFile[];
+  fileDirList: IFileDirList;
   fileContent: string;
 }
 

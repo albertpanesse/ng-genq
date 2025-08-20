@@ -1,5 +1,5 @@
 <div class="directory-tree-wrapper">
-  <div *ngFor="let item of items | isDir">
+  <div *ngFor="let item of rootItems | isDir">
     <ng-container *ngTemplateOutlet="directoryItem; context: { item }"></ng-container>
   </div>
   <create-dir-dialog-comp [visible]="isCreateDirDialogVisible" (saved)="handlerOnCreateDirDialogSaved($event)" (closed)="handlerOnCreateDirDialogClosed()" />

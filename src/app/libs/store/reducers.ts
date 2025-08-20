@@ -35,7 +35,7 @@ export const userReducer = createReducer(
 );
 
 const initialFileRepoState: IFileRepoState = {
-  fileDirList: [],
+  fileDirList: [] as IFileDirList,
   fileContent: '',
 };
 

@@ -1,11 +1,14 @@
-import { Component, DestroyRef, inject, Input, OnChanges, SimpleChanges } from "@angular/core";
+import { Component, DestroyRef, inject, Input, OnChanges, OnInit, SimpleChanges } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
+import { IGlobalState } from "../../../../libs/store";
+import { fileDirListSelector } from "../../../../libs/store/selectors";
 import { EFileExplorerActions, IFileExplorerActionPreviewParams, ITreeItem, TFileExplorerActionParams, TFileExplorerActionResult } from "../../libs/types";
 import { CreateDirDialogComponent } from "../create-dir-dialog/create-dir-dialog.component";
 import { FileViewerModalComponent } from "../file-viewer-modal/file-viewer-modal.component";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { Observable } from "rxjs";
 
 @Component({
   selector: 'file-browser-comp',
@@ -14,8 +17,8 @@ import { Observable } from "rxjs";
   standalone: true,
   imports: [CommonModule, CreateDirDialogComponent, FileViewerModalComponent]
 })
-export class FileBrowserComponent implements OnChanges {
-  @Input() items?: ITreeItem[];
+export class FileBrowserComponent implements OnInit, OnChanges {
+  @Input() childItems?: ITreeItem[];
   @Input() actions?: Map<EFileExplorerActions, (params: TFileExplorerActionParams) => Observable<TFileExplorerActionResult>>;
 
   readonly #destroyRef: DestroyRef = inject(DestroyRef);
@@ -25,9 +28,15 @@ export class FileBrowserComponent implements OnChanges {
   isPreviewModalVisible: boolean = false;
   fileContent: string = '';
 
+  constructor(private store: Store<IGlobalState>) {}
+
+  ngOnInit() {
+    
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['items'] && changes['items'].currentValue) {
-      this.filteredItems = (changes['items'].currentValue as ITreeItem[])?.filter(item => !item.fileItem.isDir) || [];
+    if (changes['childItems'] && changes['childItems'].currentValue) {
+      this.filteredItems = (changes['childItems'].currentValue as ITreeItem[])?.filter(item => !item.fileItem.isDir) || [];
     }
   }
 
@@ -40,15 +49,15 @@ export class FileBrowserComponent implements OnChanges {
   }
 
   handlerOnFileClick = (item: ITreeItem) => {
-    const action = this.actions?.get(EFileExplorerActions.FE_PREVIEW);
+    const action = this.actions?.get(EFileExplorerActions.FE_PREVIEWING);
     if (action) {
       action({
-        userFileId: item.fileItem.id,
+        userFileId: item.fileItem.userFileId,
         numberOfLine: 20,
       })
         .pipe(takeUntilDestroyed(this.#destroyRef))
-        .subscribe((fileContent: string) => {
-          this.fileContent = fileContent;
+        .subscribe((result: TFileExplorerActionResult) => {
+          this.fileContent = result as string ?? '';
         });
     }
 
