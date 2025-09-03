@@ -2,7 +2,7 @@ import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { IconDirective } from '@coreui/icons-angular';
-import { 
+import {
   ContainerComponent,
   RowComponent,
   ColComponent,
@@ -55,10 +55,10 @@ export class SignInComponent implements OnInit {
   signInForm!: FormGroup;
 
   constructor(
-    private authService: AuthService, 
-    private commonService: CommonService, 
-    private router: Router, 
-    private store: Store<IGlobalState>, 
+    private authService: AuthService,
+    private commonService: CommonService,
+    private router: Router,
+    private store: Store<IGlobalState>,
     private formBuilder: FormBuilder
   ) {
     this.signInForm = this.formBuilder.group({
@@ -66,13 +66,13 @@ export class SignInComponent implements OnInit {
       password: ['', [Validators.required]],
     });
   }
-  
+
   ngOnInit(): void {
     this.store.select(isUserLoggedInSelector)
       .pipe(takeUntilDestroyed(this.#destroyRef))
       .subscribe((isUserLoggedIn: boolean) => {
         if (isUserLoggedIn) {
-          this.router.navigate(['/-/dsb']);
+          this.router.navigate(['/-/dash']);
         }
       });
 
@@ -81,7 +81,7 @@ export class SignInComponent implements OnInit {
 
   handlerOnSubmit = () => {
     if (this.signInForm.valid) {
-      this.authService.signIn(this.signInForm.value);  
+      this.authService.signIn(this.signInForm.value);
     }
   }
 }

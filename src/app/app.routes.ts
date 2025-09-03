@@ -5,7 +5,7 @@ import { CleanLayoutComponent, DefaultLayoutComponent } from './layouts';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: '-/dsb',
+    redirectTo: '-/dash',
     pathMatch: 'full'
   },
   {
@@ -35,27 +35,27 @@ export const routes: Routes = [
     },
     children: [
       {
-        path: 'dsb',
+        path: 'dash',
         loadChildren: () => import('./pages/dashboard/routes').then((m) => m.routes)
       },
       {
-        path: 'frp',
+        path: 'repo',
         loadChildren: () => import('./pages/file-repository/routes').then((m) => m.routes)
       },
       {
-        path: 'eds',
+        path: 'conn',
         loadChildren: () => import('./pages/external-data-source/routes').then((m) => m.routes)
       },
       {
-        path: 'dqp',
+        path: 'pipe',
         loadChildren: () => import('./pages/data-query-pipeline/routes').then((m) => m.routes)
       },
       {
-        path: 'dmg',
+        path: 'sets',
         loadChildren: () => import('./pages/dataset-management/routes').then((m) => m.routes)
       },
       {
-        path: 'dvz',
+        path: 'visual',
         loadChildren: () => import('./pages/data-visualization/routes').then((m) => m.routes)
       },
     ]
@@ -88,5 +88,5 @@ export const routes: Routes = [
       title: 'Register Page'
     }
   },
-  { path: '**', redirectTo: 'dashboard' }
+  { path: '**', redirectTo: 'dash' }
 ];

@@ -5,7 +5,7 @@ import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { delay, filter, map, tap } from 'rxjs/operators';
 
-import { ColorModeService } from '@coreui/angular';
+import { ColorMode, ColorModeService } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from './icons/icon-subset';
 import { AlertComponent, LoaderComponent } from "./components";
@@ -46,39 +46,40 @@ export class AppComponent implements OnInit {
 
     this.commonService.getLoaderSubject()
       .pipe(takeUntilDestroyed(this.#destroyRef))
-      .subscribe((isLoading: boolean) => {
-        this.showLoader = isLoading;
+      .subscribe((show) => {
+        this.showLoader = show as boolean;
       });
   }
 
   ngOnInit(): void {
     this.commonService.getAlertSubject()
       .pipe(takeUntilDestroyed(this.#destroyRef))
-      .subscribe((alerts: IAlert[]) => {
-        if (alerts && alerts.length > 0) {
-          console.log('alerts', alerts);
-          this.alerts = alerts;
+      .subscribe((alerts) => {
+        const typedAlerts = alerts as IAlert[];
+        if (typedAlerts && typedAlerts.length > 0) {
+          console.log('alerts', typedAlerts);
+          this.alerts = typedAlerts;
         }
       });
 
-    this.#router.events.pipe(
-        takeUntilDestroyed(this.#destroyRef)
-      ).subscribe((evt) => {
-      if (!(evt instanceof NavigationEnd)) {
-        return;
-      }
-    });
+    this.#router.events
+      .pipe(takeUntilDestroyed(this.#destroyRef))
+      .subscribe((evt) => {
+        if (!(evt instanceof NavigationEnd)) {
+          return;
+        }
+      });
 
     this.#activatedRoute.queryParams
       .pipe(
         delay(1),
-        map(params => <string>params['theme']?.match(/^[A-Za-z0-9\s]+/)?.[0]),
-        filter(theme => ['dark', 'light', 'auto'].includes(theme)),
+        map((params: any) => <string>params['theme']?.match(/^[A-Za-z0-9\s]+/)?.[0]),
+        filter((theme: any) => ['dark', 'light', 'auto'].includes(theme)),
         tap(theme => {
-          this.#colorModeService.colorMode.set(theme);
+          this.#colorModeService.colorMode.set(theme as ColorMode);
         }),
         takeUntilDestroyed(this.#destroyRef)
       )
-      .subscribe();    
+      .subscribe();
   }
 }

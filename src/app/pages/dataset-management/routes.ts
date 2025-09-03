@@ -5,7 +5,7 @@ export const routes: Routes = [
     path: '',
     loadComponent: () => import('./dataset-management.component').then(m => m.DatasetManagementComponent),
     data: {
-      title: $localize`Dataset Management`
+      title: $localize`Datasets`
     }
   }
 ];

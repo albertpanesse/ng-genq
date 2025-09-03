@@ -175,7 +175,6 @@ export class FileService {
   }
 
   downloadFile(id: number): Observable<Blob> {
-    // Simulate file download
     const content = new Blob(['This is a mock file content'], { type: 'text/plain' });
     return of(content).pipe(delay(500));
   }

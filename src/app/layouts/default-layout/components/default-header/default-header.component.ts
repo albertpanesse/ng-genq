@@ -1,7 +1,6 @@
 import { NgStyle, NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-
 import {
   AvatarComponent,
   BadgeComponent,
@@ -25,9 +24,9 @@ import {
   TextColorDirective,
   ThemeDirective
 } from '@coreui/angular';
-
 import { IconDirective } from '@coreui/icons-angular';
-import { AuthService } from 'src/app/libs/services';
+
+import { AuthService } from '../../../../libs/services';
 
 @Component({
   selector: 'app-default-header',

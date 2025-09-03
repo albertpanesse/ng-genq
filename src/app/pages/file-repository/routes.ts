@@ -5,7 +5,7 @@ export const routes: Routes = [
     path: '',
     loadComponent: () => import('./file-repository.component').then(m => m.FileRepositoryComponent),
     data: {
-      title: $localize`File Repository`
+      title: $localize`Repository`
     }
   }
 ];
