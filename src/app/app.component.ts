@@ -8,7 +8,7 @@ import { delay, filter, map, tap } from 'rxjs/operators';
 import { ColorMode, ColorModeService } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from './icons/icon-subset';
-import { AlertComponent, LoaderComponent } from "./components";
+import { AlertComponent, ChatWidgetComponent, LoaderComponent } from "./components";
 import { CommonService, IAlert } from "./libs/services";
 import { TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
@@ -18,7 +18,7 @@ import { IGlobalState } from './libs/store';
   selector: 'app-root',
   templateUrl: './app.component.html',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, AlertComponent, LoaderComponent],
+  imports: [CommonModule, RouterOutlet, AlertComponent, LoaderComponent, ChatWidgetComponent],
 })
 export class AppComponent implements OnInit {
   title = 'GenQ - General Query';
