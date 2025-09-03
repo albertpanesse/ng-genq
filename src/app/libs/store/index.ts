@@ -37,7 +37,7 @@ export function storageMetaReducer(reducer: ActionReducer<IGlobalState>): Action
   return function (state, action) {
     if (action.type === INIT || action.type === UPDATE) {
       const storageValue = sessionStorage.getItem('__GENQ__');
-      
+
       if (storageValue) {
         try {
           return JSON.parse(storageValue);

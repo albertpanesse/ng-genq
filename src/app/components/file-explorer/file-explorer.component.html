@@ -1,13 +1,103 @@
-<div class="file-explorer-main-wrapper">
-  <div class="file-explorer-buttons">
-    <button cButton variant="outline" title="File Upload"><svg [cIcon]="icons.cilArrowThickFromBottom" width="16"></svg></button>
-  </div>
-  <div class="file-explorer-wrapper">
-    <div class="file-explorer-filetree">
-      <directory-tree-comp [actions]="actions" [rootItems]="allItems" [currentItem]="currentItem" (onDirectorySelected)="handlerOnDirectorySelected($event)" />
+<div class="file-explorer">
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <button class="btn btn-primary btn-sm" (click)="showCreateFolder = true">
+      <i class="cil-folder-open me-1"></i>
+      New Folder
+    </button>
+
+    <button class="btn btn-success btn-sm" (click)="triggerUpload()">
+      <i class="cil-cloud-upload me-1"></i>
+      Upload
+    </button>
+
+    <button class="btn btn-outline-secondary btn-sm" (click)="refreshCurrentFolder()" [disabled]="loading">
+      <i class="cil-reload me-1"></i>
+      Refresh
+    </button>
+
+    <div class="ms-auto">
+      <span class="text-muted" *ngIf="selectedFiles.length > 0">
+        {{ selectedFiles.length }} item(s) selected
+      </span>
     </div>
-    <div class="file-explorer-browser">
-      <file-browser-comp [actions]="actions" [childItems]="currentItem?.fileItem?.children" />
-    </div>  
   </div>
+
+  <!-- Breadcrumb -->
+  <app-breadcrumb [breadcrumbPath]="breadcrumbPath" (navigate)="navigateToFolder($event)">
+  </app-breadcrumb>
+
+  <!-- Main content -->
+  <div class="explorer-container">
+    <!-- Left Sidebar - Directory Tree -->
+    <div class="directory-panel">
+      <div class="p-3">
+        <h6 class="text-muted mb-3">FOLDERS</h6>
+        <app-file-tree [treeData]="treeData" [selectedNodeId]="currentFolderId" (nodeClick)="onTreeNodeClick($event)"
+          (toggleNode)="onTreeToggle($event)">
+        </app-file-tree>
+      </div>
+    </div>
+
+    <!-- Right Panel - File Browser -->
+    <div class="file-browser-panel">
+      <div class="file-browser-header">
+        <h6 class="mb-0">
+          <i class="cil-folder me-2"></i>
+          {{ getCurrentFolderName() }}
+        </h6>
+      </div>
+
+      <div *ngIf="loading" class="loading-spinner">
+        <div class="spinner-border text-primary"></div>
+      </div>
+
+      <div *ngIf="!loading">
+        <app-file-grid [files]="currentFiles" [selectedFiles]="selectedFiles" (fileClick)="onFileClick($event)"
+          (fileDoubleClick)="onFileDoubleClick($event)" (contextMenu)="onFileContextMenu($event)">
+        </app-file-grid>
+
+        <app-upload-zone *ngIf="currentFiles.length === 0" (filesSelected)="onFilesSelected($event)">
+        </app-upload-zone>
+      </div>
+    </div>
+  </div>
+
+  <!-- Context Menu -->
+  <app-context-menu [visible]="contextMenu.visible" [x]="contextMenu.x" [y]="contextMenu.y" [file]="contextMenu.file"
+    [canPaste]="clipboardService.hasContent()" (action)="onContextMenuAction($event)" (close)="hideContextMenu()">
+  </app-context-menu>
+
+  <!-- Create Folder Modal -->
+  <div class="modal" [class.show]="showCreateFolder" [style.display]="showCreateFolder ? 'block' : 'none'">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Create New Folder</h5>
+          <button type="button" class="btn-close" (click)="cancelCreateFolder()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Folder Name</label>
+            <input type="text" class="form-control" [(ngModel)]="newFolderName" placeholder="Enter folder name"
+              (keyup.enter)="createFolder()">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cancelCreateFolder()">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary" (click)="createFolder()" [disabled]="!newFolderName.trim()">
+            Create
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Backdrop -->
+  <div class="modal-backdrop fade" [class.show]="showCreateFolder" *ngIf="showCreateFolder"></div>
+
+  <!-- Hidden file input for upload -->
+  <input #fileInput type="file" multiple style="display: none" (change)="onFilesSelected($any($event).target.files)">
 </div>

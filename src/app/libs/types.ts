@@ -19,6 +19,17 @@ export interface IUserFile {
   userId: number;
 }
 
+export interface ITreeNode extends IUserFile {
+  children?: ITreeNode[];
+  expanded?: boolean;
+  loading?: boolean;
+}
+
+export interface IFileOperation {
+  type: 'copy' | 'cut';
+  files: IUserFile[];
+}
+
 export type TFileExplorerListingResponsePayload = IUserFile[];
 
 export type TFileExplorerPreviewingResponsePayload = string;
