@@ -32,8 +32,8 @@ export class FileExplorerService {
     });
   }
 
-  getList(parentId: number = -1) {
-    this.fileExplorerActor.send({ type: 'event_listing', param: parentId });
+  getList(userFileId: number = -1) {
+    this.fileExplorerActor.send({ type: 'event_listing', params: userFileId });
   }
 
   create(createDirDTO: ICreateDirDTO) {

@@ -24,19 +24,19 @@ import { TranslateModule } from "@ngx-translate/core";
 export class CreateDirDialogComponent implements OnInit {
   @Input() visible = false;
 
-  @Output() saved = new EventEmitter<string>();
-  @Output() closed = new EventEmitter<void>();
+  @Output() onSaved = new EventEmitter<string>();
+  @Output() onClosed = new EventEmitter<void>();
 
   dirName: string = '';
 
   constructor() {}
-  
+
   ngOnInit(): void {
     this.dirName = '';
   }
 
   save() {
-    this.saved.emit(this.dirName.trim());
+    this.onSaved.emit(this.dirName.trim());
     this.close();
   }
 
@@ -48,6 +48,6 @@ export class CreateDirDialogComponent implements OnInit {
     this.dirName = '';
 
     this.visible = false;
-    this.closed.emit();
+    this.onClosed.emit();
   }
 }

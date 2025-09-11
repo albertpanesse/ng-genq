@@ -1,5 +1,4 @@
 import { IFileDirList } from "../../../libs/store";
-import { IUserFile } from "../../../libs/types";
 
 export enum EContextMenuAction {
   CREATE,
@@ -30,7 +29,7 @@ export interface IFileItem {
   updatedAt: string;
   userId: number;
   groupId: string;
-  
+
   id: string;
   fileType: EFileType;
   fileSize: number;

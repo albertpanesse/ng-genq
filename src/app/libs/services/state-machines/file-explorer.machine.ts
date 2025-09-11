@@ -1,11 +1,11 @@
 import { assign, fromPromise, setup } from "xstate";
-import { ICommonFunctionResult, TFileExplorerListingResponsePayload, IErrorResponsePayload, TFileExplorerPreviewingResponsePayload } from "../../types";
+import { ICommonFunctionResult, IErrorResponsePayload, IFileExplorerCreatingResponsePayload, IFileExplorerListingResponsePayload, IFileExplorerPreviewingResponsePayload } from "../../types";
 import { creating, deleting, listing, moving, uploading, previewing } from "../apis";
 import { ApiService, CommonService, EAlertType, IAlert } from "..";
 import { IRootContext } from ".";
 import { IGlobalState } from "../../store";
 import { Store } from "@ngrx/store";
-import { setFileContentAction, setFileDirListAction } from "../../store/actions";
+import { setFileContentAction, setFileDirListAction, setUserFileAction } from "../../store/actions";
 import { ICreateDirDTO } from "../../dtos";
 
 export interface IStateFileExplorerServices {
@@ -42,10 +42,10 @@ interface IEventFileExplorerPreviewingParams {
 export const fileExplorerStateMachine = setup({
   types: {
     context: {} as IRootContext<IStateFileExplorerServices, IStateFileExplorerContext>,
-    events: {} as IStateFileExplorerEvent<'event_listing'> | 
-      IStateFileExplorerEvent<'event_creating', ICreateDirDTO> | 
-      IStateFileExplorerEvent<'event_uploading', IEventFileExplorerUploadingParams> | 
-      IStateFileExplorerEvent<'event_moving', IEventFileExplorerMovingParams> | 
+    events: {} as IStateFileExplorerEvent<'event_listing'> |
+      IStateFileExplorerEvent<'event_creating', ICreateDirDTO> |
+      IStateFileExplorerEvent<'event_uploading', IEventFileExplorerUploadingParams> |
+      IStateFileExplorerEvent<'event_moving', IEventFileExplorerMovingParams> |
       IStateFileExplorerEvent<'event_deleting', IEventFileExplorerDeletingParams> |
       IStateFileExplorerEvent<'event_previewing', IEventFileExplorerPreviewingParams>,
   },
@@ -134,7 +134,7 @@ export const fileExplorerStateMachine = setup({
               ({ context, event }) => {
                 const apiResponse = event.output;
                 if (apiResponse?.success) {
-                  const fileDirList = (apiResponse as ICommonFunctionResult<TFileExplorerListingResponsePayload>).functionResult;
+                  const fileDirList = (apiResponse as ICommonFunctionResult<IFileExplorerListingResponsePayload>).functionResult;
                   context.services.store.dispatch(setFileDirListAction({ fileDirList }));
                 } else {
                   context.context.isError = true;
@@ -175,6 +175,8 @@ export const fileExplorerStateMachine = setup({
               ({ context, event }) => {
                 const apiResponse = event.output;
                 if (apiResponse?.success) {
+                  const newDir = (apiResponse as ICommonFunctionResult<IFileExplorerCreatingResponsePayload>).functionResult;
+                  context.services.store.dispatch(setUserFileAction({ userFile: newDir }));
                 } else {
                   context.context.isError = true;
                   context.context.errorDetails = (apiResponse as ICommonFunctionResult<IErrorResponsePayload>).functionResult;
@@ -215,8 +217,8 @@ export const fileExplorerStateMachine = setup({
               ({ context, event }) => {
                 const apiResponse = event.output;
                 if (apiResponse?.success) {
-                  const fileContent = (apiResponse as ICommonFunctionResult<TFileExplorerPreviewingResponsePayload>).functionResult;
-                  context.services.store.dispatch(setFileContentAction({ fileContent }));
+                  const fileContent = (apiResponse as ICommonFunctionResult<IFileExplorerPreviewingResponsePayload>).functionResult;
+                  context.services.store.dispatch(setFileContentAction({ fileContent: fileContent.content }));
                 } else {
                   context.context.isError = true;
                   context.context.errorDetails = (apiResponse as ICommonFunctionResult<IErrorResponsePayload>).functionResult;

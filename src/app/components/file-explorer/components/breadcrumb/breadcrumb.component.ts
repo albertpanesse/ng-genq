@@ -8,12 +8,6 @@ import { ITreeNode } from '../../../../libs/types';
   imports: [CommonModule],
   template: `
     <nav class="breadcrumb">
-      <span
-        class="breadcrumb-item"
-        (click)="onNavigate(-1)">
-        Home
-      </span>
-
       <span *ngFor="let item of breadcrumbPath; let last = last">
         <i class="cil-chevron-right mx-2"></i>
         <span

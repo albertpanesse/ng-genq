@@ -6,6 +6,10 @@ export const fileDirListSelector = createSelector(
   fileRepoSelector,
   (app) => app.fileDirList
 );
+export const userFileSelector = createSelector(
+  fileRepoSelector,
+  (app) => app.userFile
+);
 export const fileContentSelector = createSelector(
   fileRepoSelector,
   (app) => app.fileContent

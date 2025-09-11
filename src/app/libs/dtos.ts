@@ -5,5 +5,5 @@ export interface IAuthDTO {
 
 export interface ICreateDirDTO {
   name: string;
-  parentId: number;
+  parent_id: number;
 }

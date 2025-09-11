@@ -1,0 +1,23 @@
+<div class="tree">
+  <ng-container *ngFor="let node of treeData">
+    <div
+      class="tree-node"
+      [style.paddingLeft.px]="depth * 16"
+      (click)="_onSelect(node, $event)">
+
+      <span class="icon" *ngIf="node.isDir">
+        {{ node.expanded ? '📂' : '📁' }}
+      </span>
+      <span class="icon" *ngIf="!node.isDir">📄</span>
+
+      <span class="title">{{ node.title }}</span>
+    </div>
+
+    <directory-tree-comp
+      *ngIf="node.expanded && node.children?.length"
+      [treeData]="node.children || []"
+      [depth]="depth + 1"
+      (onSelect)="onSelect.emit(node)"
+    ></directory-tree-comp>
+  </ng-container>
+</div>

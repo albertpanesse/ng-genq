@@ -12,20 +12,25 @@ export const navItems: INavData[] = [
     iconComponent: { name: 'cil-library' },
   },
   {
-    name: 'Connectors',
-    url: '/-/conn',
-    iconComponent: { name: 'cil-cloudy' },
-  },
-  {
-    name: 'Query Pipeline',
-    url: '/-/pipe',
+    name: 'SQL Query',
+    url: '/-/sql',
     iconComponent: { name: 'cil-zoom' },
   },
-  {
-    name: 'Datasets',
-    url: '/-/sets',
-    iconComponent: { name: 'cil-storage' },
-  },
+  // {
+  //   name: 'Connectors',
+  //   url: '/-/conn',
+  //   iconComponent: { name: 'cil-cloudy' },
+  // },
+  // {
+  //   name: 'Query Pipeline',
+  //   url: '/-/pipe',
+  //   iconComponent: { name: 'cil-zoom' },
+  // },
+  // {
+  //   name: 'Datasets',
+  //   url: '/-/sets',
+  //   iconComponent: { name: 'cil-storage' },
+  // },
   {
     name: 'Visualization',
     url: '/-/visual',

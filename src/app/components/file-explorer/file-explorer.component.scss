@@ -21,7 +21,7 @@
       padding: 5px;
 
       overflow: scroll;
-    }  
+    }
 
     .file-explorer-browser {
       display: block;
@@ -30,5 +30,23 @@
       border: 1px solid #dfdfdf;
       padding: 5px;
     }
+  }
+}
+
+.explorer-container {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+
+  .directory-panel {
+    flex: 1;
+    border-right: 1px solid #dfdfdf;
+    overflow-y: auto;
+  }
+
+  .file-browser-panel {
+    flex: 3;
+    padding: 10px;
+    overflow-y: auto;
   }
 }

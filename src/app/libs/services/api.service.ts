@@ -14,6 +14,7 @@ import { REFRESH_TOKEN_URL } from '../consts';
   providedIn: 'root',
 })
 export class ApiService {
+// oxlint-disable-next-line no-unused-private-class-members
   #defaultHeaders: { [key: string]: string } = { 'Content-Type': 'application/json' };
   #isRefreshing = false;
 

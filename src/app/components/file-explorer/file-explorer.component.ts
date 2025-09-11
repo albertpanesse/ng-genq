@@ -1,35 +1,47 @@
-import { Component, HostListener, OnInit } from "@angular/core";
+import { Component, DestroyRef, HostListener, inject, Input, OnDestroy, OnInit } from "@angular/core";
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Store } from "@ngrx/store";
+import { Observable, Subject, Subscription } from "rxjs";
+import { filter, map, switchMap, take } from "rxjs/operators";
 
 import { IUserFile, ITreeNode } from "../../libs/types";
-import { BreadcrumbComponent, ContextMenuComponent, FileGridComponent, FileTreeComponent, UploadZoneComponent } from "./components";
-import { ClipboardService, FileService } from "../../libs/services";
+import { BreadcrumbComponent, ContextMenuComponent, CreateDirDialogComponent, DirectoryTreeComponent, FileGridComponent, UploadZoneComponent } from "./components";
+import { ClipboardService, FileExplorerService, FileService } from "../../libs/services";
+import { IFileDirList } from "../../libs/store";
+import { EFileExplorerActions, IFileExplorerActionListingParams, TFileExplorerActionParams, TFileExplorerActionResult } from "./libs";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { ICreateDirDTO } from "../../libs/dtos";
+import { fileDirListSelector, userFileSelector } from "src/app/libs/store/selectors";
 
 @Component({
-  selector: 'filetree-explorer-comp',
+  selector: 'file-explorer-comp',
   templateUrl: 'file-explorer.component.html',
   styleUrls: ['file-explorer.component.scss'],
   standalone: true,
   imports: [
     CommonModule,
+    CreateDirDialogComponent,
     FormsModule,
-    FileTreeComponent,
+    DirectoryTreeComponent,
     FileGridComponent,
     ContextMenuComponent,
     UploadZoneComponent,
     BreadcrumbComponent
   ]
 })
-export class FileExplorerComponent implements OnInit {
-  treeData: ITreeNode[] = [];
+export class FileExplorerComponent implements OnInit, OnDestroy {
+  @Input() actions!: Map<EFileExplorerActions, (params: TFileExplorerActionParams) => Observable<TFileExplorerActionResult>>;
+
   currentFiles: IUserFile[] = [];
+  treeData: ITreeNode[] = [];
   selectedFiles: number[] = [];
   currentFolderId: number = -1;
   breadcrumbPath: ITreeNode[] = [];
   loading = false;
-  showCreateFolder = false;
+  showCreateDirModal = false;
   newFolderName = '';
+  selectedNode : ITreeNode | null = null;
 
   contextMenu = {
     visible: false,
@@ -38,27 +50,73 @@ export class FileExplorerComponent implements OnInit {
     file: null as IUserFile | null
   };
 
+  #listingRequest$ = new Subject<ITreeNode | null>();
+  #subscription?: Subscription;
+  readonly #destroyRef: DestroyRef = inject(DestroyRef);
+
   constructor(
+    private fileExplorerService: FileExplorerService,
     private fileService: FileService,
-    public clipboardService: ClipboardService
-  ) {}
+    public clipboardService: ClipboardService,
+    private store: Store,
+  ) { }
 
   ngOnInit(): void {
-    this.loadRootFolder();
+    this.store.select(fileDirListSelector).pipe(
+      filter(dirList => !!dirList),
+      take(1),
+    ).subscribe(result => {
+        const parsed = this.buildTreeData((result as IFileDirList).userFiles);
+
+        if (this.selectedNode) {
+          this.selectedNode.children = parsed;
+          this.selectedNode.loading = false;
+        } else {
+          this.treeData = parsed;
+          this.breadcrumbPath = parsed;
+          this.loading = false;
+        }
+      });
+
+    this.store.select(userFileSelector).pipe(
+      filter(userFile => !!userFile),
+      take(1),
+    ).subscribe(userFile => {
+      if (userFile && userFile.parentId === this.currentFolderId) {
+        this.currentFiles = [userFile, ...this.currentFiles];
+        this.addToTree(userFile);
+      }
+      this.showCreateDirModal = false;
+    });
+
+    this.loadRoot();
   }
 
-  loadRootFolder(): void {
-    this.loading = true;
-    this.fileService.getFileList(-1).subscribe(result => {
-      this.currentFiles = result.userFiles;
-      this.treeData = this.buildTreeData(result.userFiles);
-      this.loading = false;
-    });
+  ngOnDestroy(): void {
+    this.#subscription?.unsubscribe();
+  }
+
+  private requestListing(node: ITreeNode | null) {
+    this.fileExplorerService.getList(node ? node.id : -1);
+  }
+
+  loadRoot(): void {
+    this.currentFolderId = -1;
+    this.requestListing(null);
+  }
+
+  onNodeSelect(node: ITreeNode): void {
+    if (!node.isDir) return;
+
+    node.expanded = !node.expanded;
+    if (node.expanded) {
+      node.loading = true;
+      this.requestListing(node);
+    }
   }
 
   buildTreeData(files: IUserFile[]): ITreeNode[] {
-    return files
-      .filter(file => file.isDir)
+    return files?.filter(file => file.isDir)
       .map(dir => ({
         ...dir,
         children: [],
@@ -68,48 +126,42 @@ export class FileExplorerComponent implements OnInit {
   }
 
   onTreeNodeClick(node: ITreeNode): void {
-    this.currentFolderId = node.id;
-    this.loadFolderContents(node.id);
-    this.updateBreadcrumb(node);
-  }
-
-  onTreeToggle(node: ITreeNode): void {
-    if (node.expanded) {
-      node.expanded = false;
-      node.children = [];
-    } else {
-      node.loading = true;
-      node.expanded = true;
-
-      this.fileService.getFileList(node.id).subscribe(result => {
-        node.children = this.buildTreeData(result.userFiles);
-        node.loading = false;
-      });
+    if (node.isDir) {
+      this.navigateToFolder(node.id);
     }
   }
 
   loadFolderContents(folderId: number): void {
-    this.loading = true;
-    this.selectedFiles = [];
+    this.currentFolderId = folderId;
+    this.requestListing(this.findNodeById(folderId));
+  }
 
-    this.fileService.getFileList(folderId).subscribe(result => {
-      this.currentFiles = result.userFiles;
-      this.loading = false;
-    });
+  navigateToFolder(folderId: number): void {
+    this.currentFolderId = folderId;
+    this.loadFolderContents(folderId);
+
+    if (folderId === -1) {
+      this.breadcrumbPath = [];
+    } else {
+      const node = this.findNodeById(folderId);
+      if (node) {
+        this.updateBreadcrumb(node);
+      }
+    }
   }
 
   updateBreadcrumb(node: ITreeNode): void {
-    // Build breadcrumb path by traversing up the tree
     const path: ITreeNode[] = [];
     let current: ITreeNode | null = node;
 
-    while (current && current.id !== -1) {
+    while (current) {
       path.unshift(current);
       current = this.findParentNode(current.parentId);
     }
 
     this.breadcrumbPath = path;
   }
+
 
   findParentNode(parentId: number): ITreeNode | null {
     const findInTree = (nodes: ITreeNode[]): ITreeNode | null => {
@@ -126,20 +178,6 @@ export class FileExplorerComponent implements OnInit {
     };
 
     return findInTree(this.treeData);
-  }
-
-  navigateToFolder(folderId: number): void {
-    this.currentFolderId = folderId;
-    this.loadFolderContents(folderId);
-
-    if (folderId === -1) {
-      this.breadcrumbPath = [];
-    } else {
-      const node = this.findNodeById(folderId);
-      if (node) {
-        this.updateBreadcrumb(node);
-      }
-    }
   }
 
   findNodeById(id: number): ITreeNode | null {
@@ -159,18 +197,16 @@ export class FileExplorerComponent implements OnInit {
     return findInTree(this.treeData);
   }
 
-  onFileClick(event: {file: IUserFile, event: MouseEvent}): void {
+  onFileClick(event: { file: IUserFile, event: MouseEvent }): void {
     const { file, event: mouseEvent } = event;
 
     if (mouseEvent.ctrlKey || mouseEvent.metaKey) {
-      // Multi-select
       if (this.selectedFiles.includes(file.id)) {
         this.selectedFiles = this.selectedFiles.filter(id => id !== file.id);
       } else {
         this.selectedFiles.push(file.id);
       }
     } else {
-      // Single select
       this.selectedFiles = [file.id];
     }
   }
@@ -183,7 +219,7 @@ export class FileExplorerComponent implements OnInit {
     }
   }
 
-  onFileContextMenu(event: {file: IUserFile, event: MouseEvent}): void {
+  onFileContextMenu(event: { file: IUserFile, event: MouseEvent }): void {
     this.contextMenu = {
       visible: true,
       x: event.event.clientX,
@@ -241,18 +277,17 @@ export class FileExplorerComponent implements OnInit {
   }
 
   createFolder(): void {
-    if (this.newFolderName.trim()) {
-      this.fileService.createFolder(this.newFolderName.trim(), this.currentFolderId).subscribe(newFolder => {
-        this.currentFiles.push(newFolder);
-        this.addToTree(newFolder);
-        this.cancelCreateFolder();
-      });
+    this.showCreateDirModal = true;
+  }
+
+  onCreateDirSaved(dirName: any): void {
+    if (dirName) {
+      this.fileExplorerService.create({ name: dirName, parent_id: this.currentFolderId } as ICreateDirDTO);
     }
   }
 
-  cancelCreateFolder(): void {
-    this.showCreateFolder = false;
-    this.newFolderName = '';
+  onCreateDirClosed(): void {
+    this.showCreateDirModal = false;
   }
 
   copySelectedFiles(): void {
@@ -357,14 +392,9 @@ export class FileExplorerComponent implements OnInit {
   }
 
   getCurrentFolderName(): string {
-    if (this.currentFolderId === -1) {
-      return 'Root Directory';
-    }
-
     if (this.breadcrumbPath.length > 0) {
       return this.breadcrumbPath[this.breadcrumbPath.length - 1].title;
     }
-
     return 'Unknown Folder';
   }
 

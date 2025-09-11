@@ -1,6 +1,7 @@
 export interface IApiResponse {
   success: boolean;
   payload: any;
+  message?: string;
 }
 
 export interface IAuthSigningInResponsePayload {
@@ -30,11 +31,17 @@ export interface IFileOperation {
   files: IUserFile[];
 }
 
-export type TFileExplorerListingResponsePayload = IUserFile[];
+export interface IFileExplorerListingResponsePayload {
+  parentId: number;
+  userFiles: IUserFile[];
+}
 
-export type TFileExplorerPreviewingResponsePayload = string;
+export interface IFileExplorerPreviewingResponsePayload {
+  content: string;
+  fileName: string;
+}
 
-export interface IFileExplorerCreatingResponsePayload {}
+export interface IFileExplorerCreatingResponsePayload extends IUserFile {}
 
 export interface IErrorObject {
   code: EError;

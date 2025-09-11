@@ -1,7 +1,7 @@
 <div class="file-explorer">
   <!-- Toolbar -->
   <div class="toolbar">
-    <button class="btn btn-primary btn-sm" (click)="showCreateFolder = true">
+    <button class="btn btn-primary btn-sm" (click)="createFolder()">
       <i class="cil-folder-open me-1"></i>
       New Folder
     </button>
@@ -24,8 +24,7 @@
   </div>
 
   <!-- Breadcrumb -->
-  <app-breadcrumb [breadcrumbPath]="breadcrumbPath" (navigate)="navigateToFolder($event)">
-  </app-breadcrumb>
+  <app-breadcrumb [breadcrumbPath]="breadcrumbPath" (navigate)="navigateToFolder($event)"></app-breadcrumb>
 
   <!-- Main content -->
   <div class="explorer-container">
@@ -33,9 +32,11 @@
     <div class="directory-panel">
       <div class="p-3">
         <h6 class="text-muted mb-3">FOLDERS</h6>
-        <app-file-tree [treeData]="treeData" [selectedNodeId]="currentFolderId" (nodeClick)="onTreeNodeClick($event)"
-          (toggleNode)="onTreeToggle($event)">
-        </app-file-tree>
+        <directory-tree-comp
+          [treeData]="treeData"
+          [depth]="0"
+          (onSelect)="onNodeSelect($event)"
+        ></directory-tree-comp>
       </div>
     </div>
 
@@ -68,35 +69,7 @@
     [canPaste]="clipboardService.hasContent()" (action)="onContextMenuAction($event)" (close)="hideContextMenu()">
   </app-context-menu>
 
-  <!-- Create Folder Modal -->
-  <div class="modal" [class.show]="showCreateFolder" [style.display]="showCreateFolder ? 'block' : 'none'">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Create New Folder</h5>
-          <button type="button" class="btn-close" (click)="cancelCreateFolder()"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label class="form-label">Folder Name</label>
-            <input type="text" class="form-control" [(ngModel)]="newFolderName" placeholder="Enter folder name"
-              (keyup.enter)="createFolder()">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="cancelCreateFolder()">
-            Cancel
-          </button>
-          <button type="button" class="btn btn-primary" (click)="createFolder()" [disabled]="!newFolderName.trim()">
-            Create
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Backdrop -->
-  <div class="modal-backdrop fade" [class.show]="showCreateFolder" *ngIf="showCreateFolder"></div>
+  <create-dir-dialog-comp [visible]="showCreateDirModal" (onSaved)="onCreateDirSaved($event)" (onClosed)="onCreateDirClosed()"></create-dir-dialog-comp>
 
   <!-- Hidden file input for upload -->
   <input #fileInput type="file" multiple style="display: none" (change)="onFilesSelected($any($event).target.files)">

@@ -18,6 +18,7 @@ export interface IFileDirList {
 
 export interface IFileRepoState {
   fileDirList: IFileDirList;
+  userFile: IUserFile;
   fileContent: string;
 }
 
