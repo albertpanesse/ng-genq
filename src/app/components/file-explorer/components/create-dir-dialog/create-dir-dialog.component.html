@@ -7,13 +7,13 @@
     <form cForm>
       <div class="mb-3">
         <label cLabel for="dirName">Directory Name</label>
-        <input cFormControl id="dirName" type="text">
+        <input cFormControl id="dirName" type="text" [(ngModel)]="dirName" name="dirName">
         <div cFormText>Fill in directory name</div>
       </div>
     </form>
   </c-modal-body>
   <c-modal-footer>
     <button (click)="close()" cButton color="secondary">Close</button>
-    <button cButton color="primary">Save</button>
+    <button (click)="save()" cButton color="primary">Save</button>
   </c-modal-footer>
 </c-modal>

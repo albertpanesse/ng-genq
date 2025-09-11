@@ -6,7 +6,8 @@ import { Subject } from "rxjs";
 import { IUserFile } from "../types";
 import { IGlobalState } from "../store";
 import { Store } from "@ngrx/store";
-import { TFileExplorerActionParams } from "src/app/components/file-explorer/libs";
+import { TFileExplorerActionParams } from "../../components/file-explorer/libs";
+import { ICreateDirDTO } from "../dtos";
 
 @Injectable({
   providedIn: 'root',
@@ -31,12 +32,12 @@ export class FileExplorerService {
     });
   }
 
-  getList() {
-    this.fileExplorerActor.send({ type: 'event_listing' });
+  getList(userFileId: number = -1) {
+    this.fileExplorerActor.send({ type: 'event_listing', params: userFileId });
   }
 
-  create(dirName: string) {
-    this.fileExplorerActor.send({ type: 'event_creating', params: { dirName } });
+  create(createDirDTO: ICreateDirDTO) {
+    this.fileExplorerActor.send({ type: 'event_creating', params: createDirDTO });
   }
 
   previewFile(params: TFileExplorerActionParams) {

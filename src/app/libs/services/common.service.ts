@@ -48,11 +48,15 @@ export class CommonService {
   getLoaderSubject(): BehaviorSubject<boolean> {
     return this._loaderSubject$;
   }
-
+  
   setAlert(alert: IAlert): void {
     const currentAlerts = this._alertSubject$.getValue() as IAlert[];
     currentAlerts.push(alert);
     this._alertSubject$.next(currentAlerts);
+  }
+
+  resetAlert(): void {
+    this._alertSubject$.next([]);
   }
 
   getTokens(): { accessToken: string; refreshToken: string } {

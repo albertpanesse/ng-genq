@@ -12,13 +12,19 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Setup environment variable
+          command: |
+            rm -f .env && ln -s .env.production .env
+            ls -la
+      - run:
           name: Install Angular CLI and Dependencies
           command: |
             npm install -g @angular/cli
             npm install
       - run:
           name: Build Angular Project
-          command: ng build --configuration production
+          command: |
+            npm run build:prod
       - persist_to_workspace:
           root: dist
           paths:
@@ -26,22 +32,34 @@ jobs:
 
   deploy:
     docker:
-      - image: atmoz/sftp
+      - image: ubuntu:22.04
     steps:
       - attach_workspace:
           at: ~/workspace
       - run:
-          name: Add SSH key to agent
+          name: Install Required Tools
+          command: |
+            apt-get update && apt-get install -y openssh-client zip
+      - run:
+          name: Add SSH Key to Agent
           command: |
             mkdir -p ~/.ssh
             echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
-            ssh-keyscan -H $SFTP_HOST >> ~/.ssh/known_hosts  # Avoid SSH confirmation
+            ssh-keyscan -H -p 11200 $SFTP_HOST >> ~/.ssh/known_hosts
       - run:
-          name: Deploy via SFTP
+          name: Create ZIP File
           command: |
-            apk add openssh-client  # Install SSH client
-            scp -r ~/workspace/* albert@103.127.138.209:/home/albert/www/genq
+            cd ~/workspace
+            zip -r deployment.zip .  # Create a zip file of all workspace contents
+      - run:
+          name: Upload ZIP File
+          command: |
+            scp -P 11200 ~/workspace/deployment.zip albert@103.127.138.209:/home/albert/www
+      - run:
+          name: Extract on Remote Server
+          command: |
+            ssh -p 11200 albert@103.127.138.209 "unzip -o /home/albert/www/deployment.zip -d /home/albert/www && rm /home/albert/www/deployment.zip"
 
 workflows:
   version: 2

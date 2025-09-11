@@ -1,0 +1,6 @@
+<router-outlet />
+<div class="toaster-wrapper" *ngFor="let alert of alerts">
+  <alert-comp *ngIf="!!alert" [alert]="alert" />
+</div>
+<app-chat-widget></app-chat-widget>
+<loader-comp [showLoader]="showLoader" />

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { lastValueFrom, take } from 'rxjs';
+import camelcaseKeys from 'camelcase-keys';
+
 import { IGlobalState } from '../store';
 import { Store } from '@ngrx/store';
 import { tokensSelector } from '../store/selectors';
@@ -12,6 +14,7 @@ import { REFRESH_TOKEN_URL } from '../consts';
   providedIn: 'root',
 })
 export class ApiService {
+// oxlint-disable-next-line no-unused-private-class-members
   #defaultHeaders: { [key: string]: string } = { 'Content-Type': 'application/json' };
   #isRefreshing = false;
 
@@ -46,10 +49,10 @@ export class ApiService {
     try {
       const { refreshToken } = await this.#getTokens();
       const result = await lastValueFrom(this.http.post<IApiResponse>(REFRESH_TOKEN_URL, {
-        refreshToken,
+        refresh_token: refreshToken,
       }));
       if (result?.success) {
-        const { accessToken, refreshToken } = result.payload;
+        const { accessToken, refreshToken } = camelcaseKeys(result.payload);
         this.store.dispatch(setTokensAction({ accessToken, refreshToken }));
       } else {
         throw new Error('Token refresh failed.');

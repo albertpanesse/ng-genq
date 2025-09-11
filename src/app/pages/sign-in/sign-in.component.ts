@@ -2,7 +2,7 @@ import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { IconDirective } from '@coreui/icons-angular';
-import { 
+import {
   ContainerComponent,
   RowComponent,
   ColComponent,
@@ -19,7 +19,7 @@ import {
 
 import { AuthService } from '../../libs/services/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CommonService } from 'src/app/libs/services';
+import { CommonService } from '../../libs/services';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { IGlobalState } from '../../libs/store';
@@ -55,24 +55,24 @@ export class SignInComponent implements OnInit {
   signInForm!: FormGroup;
 
   constructor(
-    private authService: AuthService, 
-    private commonService: CommonService, 
-    private router: Router, 
-    private store: Store<IGlobalState>, 
+    private authService: AuthService,
+    private commonService: CommonService,
+    private router: Router,
+    private store: Store<IGlobalState>,
     private formBuilder: FormBuilder
   ) {
     this.signInForm = this.formBuilder.group({
-      username: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
     });
   }
-  
+
   ngOnInit(): void {
     this.store.select(isUserLoggedInSelector)
       .pipe(takeUntilDestroyed(this.#destroyRef))
       .subscribe((isUserLoggedIn: boolean) => {
         if (isUserLoggedIn) {
-          this.router.navigate(['/-/dsb']);
+          this.router.navigate(['/-/dash']);
         }
       });
 
@@ -81,7 +81,7 @@ export class SignInComponent implements OnInit {
 
   handlerOnSubmit = () => {
     if (this.signInForm.valid) {
-      this.authService.signIn(this.signInForm.value);  
+      this.authService.signIn(this.signInForm.value);
     }
   }
 }

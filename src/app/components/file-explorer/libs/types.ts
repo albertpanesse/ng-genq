@@ -1,3 +1,5 @@
+import { IFileDirList } from "../../../libs/store";
+
 export enum EContextMenuAction {
   CREATE,
   COPY,
@@ -18,13 +20,20 @@ export enum EFileType {
 }
 
 export interface IFileItem {
-  id: string;
-  title: string;
+  createdAt: string;
+  fileName: string;
+  userFileId: number;
   isDir: boolean;
+  parentId: number;
+  title: string;
+  updatedAt: string;
+  userId: number;
+  groupId: string;
+
+  id: string;
   fileType: EFileType;
   fileSize: number;
   children?: ITreeItem[];
-  lastUpdate: string;  
 }
 
 export interface ITreeItem {
@@ -34,15 +43,20 @@ export interface ITreeItem {
 }
 
 export interface IFileExplorerActionPreviewParams {
-  userFileId: string;
+  userFileId: number;
   numberOfLine: number;
 }
 
-export type TFileExplorerActionParams = IFileExplorerActionPreviewParams;
+export interface IFileExplorerActionListingParams {
+  userFileId: number;
+}
 
-export type TFileExplorerActionResult = string;
+export type TFileExplorerActionParams = IFileExplorerActionPreviewParams | IFileExplorerActionListingParams;
+
+export type TFileExplorerActionResult = string | IFileDirList;
 
 export enum EFileExplorerActions {
-  FE_PREVIEW,
-  FE_CREATE,
+  FE_LISTING,
+  FE_PREVIEWING,
+  FE_CREATING,
 };

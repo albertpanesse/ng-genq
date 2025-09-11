@@ -1,5 +1,5 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { IAppState, IFileRepoState } from '.';
+import { IAppState } from '../';
 
 export const appSelector = createFeatureSelector<IAppState>('app');
 export const isUserLoggedInSelector = createSelector(
@@ -12,14 +12,4 @@ export const tokensSelector = createSelector(
     accessToken: app.accessToken,
     refreshToken: app.refreshToken,
   })
-);
-
-export const fileRepoSelector = createFeatureSelector<IFileRepoState>('fileRepo');
-export const fileDirListSelector = createSelector(
-  fileRepoSelector,
-  (app) => app.fileDirList
-);
-export const fileContentSelector = createSelector(
-  fileRepoSelector,
-  (app) => app.fileContent
 );

@@ -5,7 +5,7 @@ export const routes: Routes = [
     path: '',
     loadComponent: () => import('./data-visualization.component').then(m => m.DataVisualizationComponent),
     data: {
-      title: $localize`Data Visualization`
+      title: $localize`Visualization`
     }
   }
 ];

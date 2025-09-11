@@ -3,32 +3,37 @@ import { INavData } from '@coreui/angular';
 export const navItems: INavData[] = [
   {
     name: 'Dashboard',
-    url: '/-/dsb',
+    url: '/-/dash',
     iconComponent: { name: 'cil-speedometer' },
   },
   {
-    name: 'File Repository',
-    url: '/-/frp',
+    name: 'Repository',
+    url: '/-/repo',
     iconComponent: { name: 'cil-library' },
   },
   {
-    name: 'External Data Source',
-    url: '/-/eds',
-    iconComponent: { name: 'cil-cloudy' },
-  },
-  {
-    name: 'Data Query Pipeline',
-    url: '/-/dqp',
+    name: 'SQL Query',
+    url: '/-/sql',
     iconComponent: { name: 'cil-zoom' },
   },
+  // {
+  //   name: 'Connectors',
+  //   url: '/-/conn',
+  //   iconComponent: { name: 'cil-cloudy' },
+  // },
+  // {
+  //   name: 'Query Pipeline',
+  //   url: '/-/pipe',
+  //   iconComponent: { name: 'cil-zoom' },
+  // },
+  // {
+  //   name: 'Datasets',
+  //   url: '/-/sets',
+  //   iconComponent: { name: 'cil-storage' },
+  // },
   {
-    name: 'Dataset Management',
-    url: '/-/dmg',
-    iconComponent: { name: 'cil-storage' },
-  },
-  {
-    name: 'Data Visualization',
-    url: '/-/dvz',
+    name: 'Visualization',
+    url: '/-/visual',
     iconComponent: { name: 'cil-chart-line' },
   },
 ];

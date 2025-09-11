@@ -1,47 +1,23 @@
-<div class="directory-tree-wrapper">
-  <div *ngFor="let item of items | isDir">
-    <ng-container *ngTemplateOutlet="directoryItem; context: { item }"></ng-container>
-  </div>
-  <create-dir-dialog-comp [visible]="isCreateDirDialogVisible" (closed)="handlerOnCreateDirDialogClosed()" />
+<div class="tree">
+  <ng-container *ngFor="let node of treeData">
+    <div
+      class="tree-node"
+      [style.paddingLeft.px]="depth * 16"
+      (click)="_onSelect(node, $event)">
+
+      <span class="icon" *ngIf="node.isDir">
+        {{ node.expanded ? '📂' : '📁' }}
+      </span>
+      <span class="icon" *ngIf="!node.isDir">📄</span>
+
+      <span class="title">{{ node.title }}</span>
+    </div>
+
+    <directory-tree-comp
+      *ngIf="node.expanded && node.children?.length"
+      [treeData]="node.children || []"
+      [depth]="depth + 1"
+      (onSelect)="onSelect.emit(node)"
+    ></directory-tree-comp>
+  </ng-container>
 </div>
-
-<ng-template #directoryItem let-item="item">
-  <div
-    class="directory-tree-parent"
-    [ngStyle]="{ 'background-color': item.isOpened ? '#dedede' : 'inherit' }"
-  >
-    <div class="directory-tree-arrow" (click)="handlerOnToggle(item)"><svg [cIcon]="item.isExpanded ? icons.cilMinus : icons.cilPlus"></svg></div>
-    <div class="directory-tree-info">
-      <svg [cIcon]="item.isOpened ? icons.cilFolderOpen : icons.cilFolder"></svg>
-      <span (click)="handlerOnTreeItemClicked(item)">{{ item.fileItem.title }}</span>
-      <button        
-        [cPopoverTrigger]="'focus'"
-        [cPopoverPlacement]="'right'"
-        [cPopover]="contextMenu"
-      >
-        <svg width="24" [cIcon]="icons.cilOptions"></svg>
-    </button>
-    </div>
-  </div>
-  <div class="directory-tree-child" *ngIf="item.fileItem.children.length > 0" [ngStyle]="{ display: item.isExpanded ? '' : 'none' }">
-    <div *ngFor="let childItem of item.fileItem.children | isDir">
-      <ng-container *ngTemplateOutlet="directoryItem; context: { item: childItem }"></ng-container>
-    </div>
-  </div>
-</ng-template>
-
-<ng-template #contextMenu>
-  <c-nav variant="pills" class="flex-column">
-    <a cNavLink (click)="handlerOnContextAction(contextMenuAction.CREATE)">Create Directory</a>
-    <hr noshade>
-    <a cNavLink (click)="handlerOnContextAction(contextMenuAction.COPY)">Copy</a>
-    <a cNavLink (click)="handlerOnContextAction(contextMenuAction.CUT)">Cut</a>
-    <a cNavLink (click)="handlerOnContextAction(contextMenuAction.PASTE)">Paste</a>
-    <hr noshade>
-    <a cNavLink (click)="handlerOnContextAction(contextMenuAction.RENAME)">Rename</a>
-    <a cNavLink (click)="handlerOnContextAction(contextMenuAction.DELETE)">Delete</a>
-    <hr noshade>
-    <a cNavLink (click)="handlerOnContextAction(contextMenuAction.UPLOAD)">Upload</a>
-    <a cNavLink (click)="handlerOnContextAction(contextMenuAction.DOWNLOAD)">Download</a>
-  </c-nav>
-</ng-template>

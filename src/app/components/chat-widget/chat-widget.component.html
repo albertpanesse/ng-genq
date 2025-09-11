@@ -1,0 +1,50 @@
+<!-- Floating Chat Button -->
+<button class="chat-toggle-btn btn btn-primary rounded-circle shadow"
+        *ngIf="!isOpen && !isMinimized"
+        (click)="toggleChat()">
+  💬
+</button>
+
+<!-- Minimized Bubble -->
+<div class="chat-bubble shadow bg-primary text-white d-flex align-items-center justify-content-center"
+     *ngIf="isMinimized"
+     (click)="restoreChat()">
+  💬
+</div>
+
+<!-- Full Chat Window -->
+<div class="chat-window border rounded shadow"
+     *ngIf="isOpen && !isMinimized">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center p-2 border-bottom bg-primary text-white">
+    <span>SQL Assistant</span>
+    <div>
+      <button class="btn btn-sm btn-light me-2" (click)="minimizeChat()">–</button>
+      <button class="btn-close btn-close-white" (click)="toggleChat()"></button>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="flex-grow-1 overflow-auto p-3">
+    <div *ngFor="let msg of messages" class="mb-2">
+      <div [ngClass]="{'text-end': msg.sender === 'user', 'text-start': msg.sender === 'llm'}">
+        <div [ngClass]="{
+          'bg-primary text-white': msg.sender === 'user',
+          'bg-secondary text-white': msg.sender === 'llm'
+        }" class="d-inline-block p-2 rounded-3">
+          {{ msg.text }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="p-2 border-top d-flex align-items-center">
+    <input type="file" (change)="onFileUpload($event)" class="form-control w-auto me-2" />
+    <input [(ngModel)]="inputText"
+           (keyup.enter)="sendMessage()"
+           class="form-control me-2"
+           placeholder="Tulis pertanyaan Anda..." />
+    <button class="btn btn-primary" (click)="sendMessage()">Kirim</button>
+  </div>
+</div>

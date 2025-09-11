@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { CommonService } from "src/app/libs/services";
+import { CommonService } from "../../libs/services";
 
 @Component({
   selector: 'dashboard-comp',
@@ -8,7 +8,7 @@ import { CommonService } from "src/app/libs/services";
   standalone: true,
 })
 export class DashboardComponent implements OnInit {
-  
+
   constructor(private commonService: CommonService) {}
 
   ngOnInit(): void {

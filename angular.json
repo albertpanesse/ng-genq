@@ -6,7 +6,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "coreui-free-angular-admin-template": {
+    "genq": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -23,7 +23,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/coreui-free-angular-admin-template",
+            "outputPath": "dist/genq",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -39,7 +39,8 @@
               { "glob": "**/*", "input": "node_modules/monaco-editor", "output": "assets/monaco-editor/" }
             ],
             "styles": [
-              "src/scss/styles.scss"
+              "src/scss/styles.scss",
+              "src/scss/file-explorer.css"
             ],
             "scripts": [],
             "allowedCommonJsDependencies": []
@@ -73,18 +74,21 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "coreui-free-angular-admin-template:build:production"
+              "buildTarget": "genq:build:production"
             },
             "development": {
-              "buildTarget": "coreui-free-angular-admin-template:build:development"
+              "buildTarget": "genq:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+            "proxyConfig": "proxy.json"
+          }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "coreui-free-angular-admin-template:build"
+            "buildTarget": "genq:build"
           }
         },
         "test": {

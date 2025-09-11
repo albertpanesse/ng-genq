@@ -1,42 +1,24 @@
-.directory-tree-wrapper {
-  display: flex;
-  flex-direction: column;
-}
-
-.directory-tree-parent {
-  display: flex;
-  flex-direction: row;
-
-  padding: 10px;
-
-  .directory-tree-arrow {
-    flex: 1;
-  }
-
-  .directory-tree-info {
-    flex: 5;
-
+.tree {
+  .tree-node {
+    cursor: pointer;
+    user-select: none;
     display: flex;
-    flex-direction: row;
-    gap: 3px;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 4px;
 
-    svg::first-child {
-      flex: 1;
+    &:hover {
+      background-color: #f0f0f0;
     }
 
-    span {
-      flex: 5;
+    .icon {
+      margin-right: 8px;
+      width: 16px;
+      text-align: center;
     }
 
-    button {
-      border: none;
-      background-color: transparent;
-      flex: 1;
+    .title {
+      flex-grow: 1;
     }
   }
-}
-
-.directory-tree-child {
-  display: block;
-  margin-left: 20px;
 }

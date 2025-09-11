@@ -1,6 +1,7 @@
 export interface IApiResponse {
   success: boolean;
   payload: any;
+  message?: string;
 }
 
 export interface IAuthSigningInResponsePayload {
@@ -9,19 +10,38 @@ export interface IAuthSigningInResponsePayload {
 }
 
 export interface IUserFile {
+  createdAt: string;
+  fileName: string;
   id: number;
-  userId: number;
-  title: string;
   isDir: boolean;
   parentId: number;
+  title: string;
+  updatedAt: string;
+  userId: number;
+}
+
+export interface ITreeNode extends IUserFile {
+  children?: ITreeNode[];
+  expanded?: boolean;
+  loading?: boolean;
+}
+
+export interface IFileOperation {
+  type: 'copy' | 'cut';
+  files: IUserFile[];
+}
+
+export interface IFileExplorerListingResponsePayload {
+  parentId: number;
+  userFiles: IUserFile[];
+}
+
+export interface IFileExplorerPreviewingResponsePayload {
+  content: string;
   fileName: string;
 }
 
-export type TFileExplorerListingResponsePayload = IUserFile[];
-
-export type TFileExplorerPreviewingResponsePayload = string;
-
-export interface IFileExplorerCreatingResponsePayload {}
+export interface IFileExplorerCreatingResponsePayload extends IUserFile {}
 
 export interface IErrorObject {
   code: EError;
@@ -38,11 +58,6 @@ export interface IErrorResponsePayload {
 export interface ICommonFunctionResult<T> {
   success: boolean;
   functionResult: T;
-}
-
-export interface IAuthCredential {
-  username: string;
-  password: string;
 }
 
 export enum EError {

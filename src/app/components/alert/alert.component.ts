@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { Component, Input, OnInit, signal } from "@angular/core";
 import { ToastModule } from "@coreui/angular";
-import { IAlert } from "src/app/libs/services";
+import { IAlert } from "../../libs/services";
 
 @Component({
   selector: 'alert-comp',
@@ -10,11 +10,11 @@ import { IAlert } from "src/app/libs/services";
   imports: [CommonModule, ToastModule],
 })
 export class AlertComponent implements OnInit {
-  @Input() alerts: IAlert[] = [];
+  @Input() alert!: IAlert;
 
   visible = signal(true);
 
   ngOnInit(): void {
-    // this.visible.update(value => !value);
+    this.alert.triggered = !this.alert.triggered;
   }
 }

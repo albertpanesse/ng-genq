@@ -3,9 +3,9 @@ import { createActor } from 'xstate';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
-import { authStateMachine, IStateAuthContext } from './state-machines';
+import { authStateMachine } from './state-machines';
 import { ApiService, CommonService } from '.';
-import { IAuthCredential } from '../types';
+import { IAuthDTO } from '../dtos';
 import { IUser } from '../models';
 import { IGlobalState } from '../store';
 
@@ -47,7 +47,7 @@ export class AuthService {
     return snapshot.context.context.user;
   }
 
-  signIn(authCredential: IAuthCredential) {
+  signIn(authCredential: IAuthDTO) {
     this.authActor.send({ type: 'event_signingIn', params: authCredential });
   }
 
