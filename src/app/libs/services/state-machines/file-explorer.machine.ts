@@ -6,7 +6,7 @@ import { IRootContext } from ".";
 import { IGlobalState } from "../../store";
 import { Store } from "@ngrx/store";
 import { setFileContentAction, setFileDirListAction, setUserFileAction } from "../../store/actions";
-import { ICreateDirDTO } from "../../dtos";
+import { ICreateDirDTO, IFileDirListDTO } from "../../dtos";
 
 export interface IStateFileExplorerServices {
   apiService: ApiService;
@@ -16,6 +16,7 @@ export interface IStateFileExplorerServices {
 
 export interface IStateFileExplorerContext {
   createDirDTO: ICreateDirDTO;
+  fileDirListDTO: IFileDirListDTO;
   params: {
     previewing: IEventFileExplorerPreviewingParams;
   };
@@ -86,6 +87,7 @@ export const fileExplorerStateMachine = setup({
       },
       context: {
         createDirDTO: {} as ICreateDirDTO,
+        fileDirListDTO: {} as IFileDirListDTO,
         params: {
           previewing: {
             userFileId: -1,
@@ -126,7 +128,7 @@ export const fileExplorerStateMachine = setup({
       state_listing: {
         invoke: {
           src: 'actor_listing',
-          input: ({ context: { services: { apiService } } }) => ({ apiService }),
+          input: ({ context: { services: { apiService }, context: { fileDirListDTO } } }) => ({ apiService, fileDirListDTO }),
           onDone: {
             target: 'state_afterListing',
             actions: [

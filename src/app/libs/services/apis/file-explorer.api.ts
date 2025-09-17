@@ -1,12 +1,13 @@
 import camelcaseKeys from "camelcase-keys";
 import { IApiResponse, ICommonFunctionResult, IErrorResponsePayload, IFileExplorerCreatingResponsePayload, IFileExplorerListingResponsePayload, IFileExplorerPreviewingResponsePayload } from "../../types";
 import { USER_FILE_CREATE, USER_FILE_LIST, USER_FILE_PREVIEW } from '../../consts';
-import { ICreateDirDTO } from "../../dtos";
+import { ICreateDirDTO, IFileDirListDTO } from "../../dtos";
 import { ApiService } from "../api.service";
+import { HttpParams } from "@angular/common/http";
 
-export const listing = async ({ input: { apiService, userFileId } }: any): Promise<ICommonFunctionResult<IFileExplorerListingResponsePayload> | ICommonFunctionResult<IErrorResponsePayload>> => {
+export const listing = async ({ input: { apiService, fileDirListDTO } }: { input: { apiService: ApiService, fileDirListDTO: IFileDirListDTO } }): Promise<ICommonFunctionResult<IFileExplorerListingResponsePayload> | ICommonFunctionResult<IErrorResponsePayload>> => {
   try {
-    const result: IApiResponse = await apiService.get(`${USER_FILE_LIST}/${userFileId}`, null, {}, true);
+    const result: IApiResponse = await apiService.get(`${USER_FILE_LIST}/${fileDirListDTO.userFileId}`, {} as HttpParams, {}, true);
     return {
       success: result.success,
       functionResult: camelcaseKeys(result.payload, { deep: true}) as IFileExplorerListingResponsePayload,
