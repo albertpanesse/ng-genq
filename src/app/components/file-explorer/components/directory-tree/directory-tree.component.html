@@ -5,7 +5,7 @@
       [style.paddingLeft.px]="depth * 16"
       (click)="_onSelect(node, $event)">
 
-      <span class="icon" *ngIf="node.isDir">
+      <span class="icon" *ngIf="node.isDir" (click)="toggleNode(node, $event)">
         {{ node.expanded ? '📂' : '📁' }}
       </span>
       <span class="icon" *ngIf="!node.isDir">📄</span>

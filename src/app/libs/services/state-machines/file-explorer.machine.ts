@@ -50,12 +50,14 @@ export const fileExplorerStateMachine = setup({
       IStateFileExplorerEvent<'event_previewing', IEventFileExplorerPreviewingParams>,
   },
   actions: {
-    action_resetError: assign({
-      context: {
+    action_resetError: ({ context }) => {
+      context.context = {
         isError: false,
         errorDetails: null,
-      } as IStateFileExplorerContext,
-    }),
+      } as IStateFileExplorerContext;
+
+      context.services.commonService.resetAlert();
+    },
     action_showAlert: ({ context }) => {
       context.services.commonService.setAlert({
         type: EAlertType.AT_ERROR,

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ITreeNode, IUserFile } from '../../../../libs/types';
 
@@ -8,13 +8,17 @@ import { ITreeNode, IUserFile } from '../../../../libs/types';
   imports: [CommonModule],
   templateUrl: './file-grid.component.html',
 })
-export class FileGridComponent {
+export class FileGridComponent implements OnChanges {
   @Input() files: ITreeNode[] = [];
   @Input() selectedFiles: number[] = [];
 
   @Output() fileClick = new EventEmitter<{file: IUserFile, event: MouseEvent}>();
   @Output() fileDoubleClick = new EventEmitter<IUserFile>();
   @Output() contextMenu = new EventEmitter<{file: IUserFile, event: MouseEvent}>();
+
+  ngOnChanges(): void {
+    console.log('Files updated:', this.files);
+  }
 
   onFileClick(file: IUserFile, event: MouseEvent): void {
     this.fileClick.emit({ file, event });
