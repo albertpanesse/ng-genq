@@ -11,3 +11,8 @@ export interface ICreateDirDTO {
 export interface IFileDirListDTO {
   userFileId: number;
 }
+
+export interface IPreviewFileDTO {
+  userFileId: number;
+  numberOfLine: number;
+}

@@ -43,7 +43,7 @@ interface IEventFileExplorerPreviewingParams {
 export const fileExplorerStateMachine = setup({
   types: {
     context: {} as IRootContext<IStateFileExplorerServices, IStateFileExplorerContext>,
-    events: {} as IStateFileExplorerEvent<'event_listing'> |
+    events: {} as IStateFileExplorerEvent<'event_listing', IFileDirListDTO> |
       IStateFileExplorerEvent<'event_creating', ICreateDirDTO> |
       IStateFileExplorerEvent<'event_uploading', IEventFileExplorerUploadingParams> |
       IStateFileExplorerEvent<'event_moving', IEventFileExplorerMovingParams> |
@@ -104,6 +104,11 @@ export const fileExplorerStateMachine = setup({
         on: {
           event_listing: {
             target: 'state_listing',
+            actions: assign({
+              context: ({ event }) => ({
+                fileDirListDTO: event.params as IFileDirListDTO,
+              } as IStateFileExplorerContext),
+            }),
           },
           event_creating: {
             target: 'state_creating',

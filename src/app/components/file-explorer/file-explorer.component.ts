@@ -10,7 +10,7 @@ import { BreadcrumbComponent, ContextMenuComponent, CreateDirDialogComponent, Di
 import { ClipboardService, FileExplorerService, FileService } from "../../libs/services";
 import { IFileDirList } from "../../libs/store";
 import { EFileExplorerActions, TFileExplorerActionParams, TFileExplorerActionResult } from "./libs";
-import { ICreateDirDTO } from "../../libs/dtos";
+import { ICreateDirDTO, IFileDirListDTO } from "../../libs/dtos";
 import { fileDirListSelector, userFileSelector } from "../../libs/store/selectors";
 
 @Component({
@@ -98,7 +98,9 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   }
 
   private requestListing(node: ITreeNode | null) {
-    this.fileExplorerService.getList(node ? node.id : -1);
+    this.fileExplorerService.getList({
+      userFileId: node ? node.id : -1
+    } as IFileDirListDTO);
   }
 
   loadRoot(): void {
