@@ -62,8 +62,9 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
     this.store.select(fileDirListSelector).pipe(
       filter(dirList => !!dirList),
     ).subscribe(result => {
-        const parsed = this.buildTreeData((result as IFileDirList).userFiles);
+        this.currentFiles = (result as IFileDirList).userFiles;
 
+        const parsed = this.buildTreeData((result as IFileDirList).userFiles);
         if (this.selectedNode) {
           this.selectedNode.children = parsed;
           this.selectedNode.loading = false;
@@ -74,7 +75,7 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
         }
       });
 
-    // Subscribe to create directory results
+    // Subscribe to create directory and upload results
     this.store.select(userFileSelector).pipe(
       filter(userFile => !!userFile),
       take(1),
@@ -109,12 +110,9 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
     if (!node.isDir) return;
 
     this.selectedNode = node;
-    this.selectedNode.expanded = !this.selectedNode.expanded;
 
-    if (this.selectedNode.expanded && (!this.selectedNode.children || this.selectedNode.children.length === 0)) {
-      node.loading = true;
-      this.requestListing(node);
-    }
+    node.loading = true;
+    this.requestListing(node);
   }
 
   buildTreeData(files: IUserFile[]): ITreeNode[] {
@@ -283,8 +281,8 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   }
 
   onCreateDirSaved(dirName: any): void {
-    if (dirName) {
-      this.fileExplorerService.create({ name: dirName, parent_id: this.currentFolderId } as ICreateDirDTO);
+    if (dirName && this.selectedNode) {
+      this.fileExplorerService.create({ name: dirName, parent_id: this.selectedNode.id } as ICreateDirDTO);
     }
   }
 

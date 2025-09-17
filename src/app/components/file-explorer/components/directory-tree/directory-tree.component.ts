@@ -21,6 +21,11 @@ export class DirectoryTreeComponent implements OnChanges {
     console.log('DirectoryTreeComponent initialized with data:', this.treeData);
   }
 
+  toggleNode(node: ITreeNode, event: MouseEvent) {
+    event.stopPropagation();
+    node.expanded = !node.expanded;
+  }
+
   _onSelect(node: ITreeNode, event: MouseEvent) {
     event.stopPropagation();
     this.onSelect.emit(node);
