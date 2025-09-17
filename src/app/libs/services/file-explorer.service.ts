@@ -7,14 +7,16 @@ import { IUserFile } from "../types";
 import { IGlobalState } from "../store";
 import { Store } from "@ngrx/store";
 import { TFileExplorerActionParams } from "../../components/file-explorer/libs";
-import { ICreateDirDTO } from "../dtos";
+import { ICreateDirDTO, IFileDirListDTO, IPreviewFileDTO } from "../dtos";
 
 @Injectable({
   providedIn: 'root',
 })
 export class FileExplorerService {
-  private fileExplorerActor: any;
-  private fileDirListObs$: Subject<IUserFile[]> = new Subject();
+  private fileExplorerActor = createActor(fileExplorerStateMachine, {
+    input: { services: {} as any },
+  });
+  private fileDirListObs$ = new Subject<IUserFile[]>();
 
   constructor(private store: Store<IGlobalState>, private apiService: ApiService, private commonService: CommonService) {
     this.fileExplorerActor = createActor(fileExplorerStateMachine, {
@@ -32,15 +34,15 @@ export class FileExplorerService {
     });
   }
 
-  getList(userFileId: number = -1) {
-    this.fileExplorerActor.send({ type: 'event_listing', params: userFileId });
+  getList(fileDirListDTO: IFileDirListDTO) {
+    this.fileExplorerActor.send({ type: 'event_listing', params: fileDirListDTO });
   }
 
   create(createDirDTO: ICreateDirDTO) {
     this.fileExplorerActor.send({ type: 'event_creating', params: createDirDTO });
   }
 
-  previewFile(params: TFileExplorerActionParams) {
-    this.fileExplorerActor.send({ type: 'event_previewing', params });
+  previewFile(previewFileDTO: IPreviewFileDTO) {
+    this.fileExplorerActor.send({ type: 'event_previewing', params: previewFileDTO });
   }
 }

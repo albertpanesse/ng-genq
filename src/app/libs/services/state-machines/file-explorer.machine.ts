@@ -6,7 +6,7 @@ import { IRootContext } from ".";
 import { IGlobalState } from "../../store";
 import { Store } from "@ngrx/store";
 import { setFileContentAction, setFileDirListAction, setUserFileAction } from "../../store/actions";
-import { ICreateDirDTO } from "../../dtos";
+import { ICreateDirDTO, IFileDirListDTO } from "../../dtos";
 
 export interface IStateFileExplorerServices {
   apiService: ApiService;
@@ -16,6 +16,7 @@ export interface IStateFileExplorerServices {
 
 export interface IStateFileExplorerContext {
   createDirDTO: ICreateDirDTO;
+  fileDirListDTO: IFileDirListDTO;
   params: {
     previewing: IEventFileExplorerPreviewingParams;
   };
@@ -42,7 +43,7 @@ interface IEventFileExplorerPreviewingParams {
 export const fileExplorerStateMachine = setup({
   types: {
     context: {} as IRootContext<IStateFileExplorerServices, IStateFileExplorerContext>,
-    events: {} as IStateFileExplorerEvent<'event_listing'> |
+    events: {} as IStateFileExplorerEvent<'event_listing', IFileDirListDTO> |
       IStateFileExplorerEvent<'event_creating', ICreateDirDTO> |
       IStateFileExplorerEvent<'event_uploading', IEventFileExplorerUploadingParams> |
       IStateFileExplorerEvent<'event_moving', IEventFileExplorerMovingParams> |
@@ -86,6 +87,7 @@ export const fileExplorerStateMachine = setup({
       },
       context: {
         createDirDTO: {} as ICreateDirDTO,
+        fileDirListDTO: {} as IFileDirListDTO,
         params: {
           previewing: {
             userFileId: -1,
@@ -102,6 +104,11 @@ export const fileExplorerStateMachine = setup({
         on: {
           event_listing: {
             target: 'state_listing',
+            actions: assign({
+              context: ({ event }) => ({
+                fileDirListDTO: event.params as IFileDirListDTO,
+              } as IStateFileExplorerContext),
+            }),
           },
           event_creating: {
             target: 'state_creating',
@@ -126,7 +133,7 @@ export const fileExplorerStateMachine = setup({
       state_listing: {
         invoke: {
           src: 'actor_listing',
-          input: ({ context: { services: { apiService } } }) => ({ apiService }),
+          input: ({ context: { services: { apiService }, context: { fileDirListDTO } } }) => ({ apiService, fileDirListDTO }),
           onDone: {
             target: 'state_afterListing',
             actions: [

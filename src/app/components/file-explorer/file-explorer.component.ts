@@ -3,16 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Store } from "@ngrx/store";
 import { Observable, Subject, Subscription } from "rxjs";
-import { filter, map, switchMap, take } from "rxjs/operators";
+import { filter, take } from "rxjs/operators";
 
 import { IUserFile, ITreeNode } from "../../libs/types";
 import { BreadcrumbComponent, ContextMenuComponent, CreateDirDialogComponent, DirectoryTreeComponent, FileGridComponent, UploadZoneComponent } from "./components";
 import { ClipboardService, FileExplorerService, FileService } from "../../libs/services";
 import { IFileDirList } from "../../libs/store";
-import { EFileExplorerActions, IFileExplorerActionListingParams, TFileExplorerActionParams, TFileExplorerActionResult } from "./libs";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { ICreateDirDTO } from "../../libs/dtos";
-import { fileDirListSelector, userFileSelector } from "src/app/libs/store/selectors";
+import { EFileExplorerActions, TFileExplorerActionParams, TFileExplorerActionResult } from "./libs";
+import { ICreateDirDTO, IFileDirListDTO } from "../../libs/dtos";
+import { fileDirListSelector, userFileSelector } from "../../libs/store/selectors";
 
 @Component({
   selector: 'file-explorer-comp',
@@ -62,6 +61,7 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    // Subscribe to listing requests
     this.store.select(fileDirListSelector).pipe(
       filter(dirList => !!dirList),
       take(1),
@@ -89,6 +89,7 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
       this.showCreateDirModal = false;
     });
 
+    // initialize
     this.loadRoot();
   }
 
@@ -97,7 +98,9 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   }
 
   private requestListing(node: ITreeNode | null) {
-    this.fileExplorerService.getList(node ? node.id : -1);
+    this.fileExplorerService.getList({
+      userFileId: node ? node.id : -1
+    } as IFileDirListDTO);
   }
 
   loadRoot(): void {
@@ -392,8 +395,8 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   }
 
   getCurrentFolderName(): string {
-    if (this.breadcrumbPath.length > 0) {
-      return this.breadcrumbPath[this.breadcrumbPath.length - 1].title;
+    if (this.breadcrumbPath?.length > 0) {
+      return this.breadcrumbPath[this.breadcrumbPath?.length - 1].title;
     }
     return 'Unknown Folder';
   }
