@@ -1,42 +1,17 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IUserFile } from '../../../../libs/types';
+import { ITreeNode, IUserFile } from '../../../../libs/types';
 
 @Component({
   selector: 'app-file-grid',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="file-grid" *ngIf="files.length > 0; else emptyState">
-      <div
-        *ngFor="let file of files"
-        class="file-item"
-        [class.selected]="selectedFiles.includes(file.id)"
-        (click)="onFileClick(file, $event)"
-        (dblclick)="onFileDoubleClick(file)"
-        (contextmenu)="onContextMenu(file, $event)">
-
-        <div class="file-icon" [ngClass]="getFileIconClass(file)">
-          <i [class]="getFileIcon(file)"></i>
-        </div>
-
-        <div class="file-name" [title]="file.title">
-          {{ file.title }}
-        </div>
-      </div>
-    </div>
-
-    <ng-template #emptyState>
-      <div class="text-center p-5">
-        <i class="cil-folder-open" style="font-size: 64px; color: #6c757d;"></i>
-        <p class="mt-3 text-muted">This folder is empty</p>
-      </div>
-    </ng-template>
-  `
+  templateUrl: './file-grid.component.html',
 })
 export class FileGridComponent {
-  @Input() files: IUserFile[] = [];
+  @Input() files: ITreeNode[] = [];
   @Input() selectedFiles: number[] = [];
+
   @Output() fileClick = new EventEmitter<{file: IUserFile, event: MouseEvent}>();
   @Output() fileDoubleClick = new EventEmitter<IUserFile>();
   @Output() contextMenu = new EventEmitter<{file: IUserFile, event: MouseEvent}>();

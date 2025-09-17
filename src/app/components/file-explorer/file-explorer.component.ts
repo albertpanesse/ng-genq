@@ -1,16 +1,16 @@
-import { Component, DestroyRef, HostListener, inject, Input, OnDestroy, OnInit } from "@angular/core";
+import { Component, HostListener, inject, Input, OnDestroy, OnInit } from "@angular/core";
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Store } from "@ngrx/store";
-import { Observable, Subject, Subscription } from "rxjs";
+import { Observable, Subscription } from "rxjs";
 import { filter, take } from "rxjs/operators";
 
 import { IUserFile, ITreeNode } from "../../libs/types";
 import { BreadcrumbComponent, ContextMenuComponent, CreateDirDialogComponent, DirectoryTreeComponent, FileGridComponent, UploadZoneComponent } from "./components";
-import { ClipboardService, FileExplorerService, FileService } from "../../libs/services";
+import { ClipboardService, FileExplorerService } from "../../libs/services";
 import { IFileDirList } from "../../libs/store";
 import { EFileExplorerActions, TFileExplorerActionParams, TFileExplorerActionResult } from "./libs";
-import { ICreateDirDTO, IFileDirListDTO } from "../../libs/dtos";
+import { ICreateDirDTO, IFileDirListDTO, IUploadFileDTO } from "../../libs/dtos";
 import { fileDirListSelector, userFileSelector } from "../../libs/store/selectors";
 
 @Component({
@@ -49,13 +49,10 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
     file: null as IUserFile | null
   };
 
-  #listingRequest$ = new Subject<ITreeNode | null>();
   #subscription?: Subscription;
-  readonly #destroyRef: DestroyRef = inject(DestroyRef);
 
   constructor(
     private fileExplorerService: FileExplorerService,
-    private fileService: FileService,
     public clipboardService: ClipboardService,
     private store: Store,
   ) { }
@@ -64,7 +61,6 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
     // Subscribe to listing requests
     this.store.select(fileDirListSelector).pipe(
       filter(dirList => !!dirList),
-      take(1),
     ).subscribe(result => {
         const parsed = this.buildTreeData((result as IFileDirList).userFiles);
 
@@ -78,6 +74,7 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
         }
       });
 
+    // Subscribe to create directory results
     this.store.select(userFileSelector).pipe(
       filter(userFile => !!userFile),
       take(1),
@@ -99,7 +96,7 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
 
   private requestListing(node: ITreeNode | null) {
     this.fileExplorerService.getList({
-      userFileId: node ? node.id : -1
+      user_file_id: node ? node.id : -1
     } as IFileDirListDTO);
   }
 
@@ -111,8 +108,10 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   onNodeSelect(node: ITreeNode): void {
     if (!node.isDir) return;
 
-    node.expanded = !node.expanded;
-    if (node.expanded) {
+    this.selectedNode = node;
+    this.selectedNode.expanded = !this.selectedNode.expanded;
+
+    if (this.selectedNode.expanded && (!this.selectedNode.children || this.selectedNode.children.length === 0)) {
       node.loading = true;
       this.requestListing(node);
     }
@@ -272,10 +271,10 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
 
   onFilesSelected(fileList: FileList): void {
     Array.from(fileList).forEach(file => {
-      this.fileService.uploadFile(file, this.currentFolderId).subscribe(newFile => {
-        this.currentFiles.push(newFile);
-        this.addToTree(newFile);
-      });
+      this.fileExplorerService.uploadFile({
+        file,
+        parent_id: this.currentFolderId
+      } as IUploadFileDTO);
     });
   }
 
@@ -309,18 +308,18 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
 
     clipboard.files.forEach(file => {
       if (clipboard.type === 'copy') {
-        this.fileService.copyFile(file.id, this.currentFolderId).subscribe(copiedFile => {
-          if (copiedFile) {
-            this.currentFiles.push(copiedFile);
-            this.addToTree(copiedFile);
-          }
-        });
+        // this.fileService.copyFile(file.id, this.currentFolderId).subscribe(copiedFile => {
+        //   if (copiedFile) {
+        //     this.currentFiles.push(copiedFile);
+        //     this.addToTree(copiedFile);
+        //   }
+        // });
       } else if (clipboard.type === 'cut') {
-        this.fileService.moveFile(file.id, this.currentFolderId).subscribe(movedFile => {
-          this.currentFiles.push(movedFile);
-          this.removeFromTree(file.id);
-          this.addToTree(movedFile);
-        });
+        // this.fileService.moveFile(file.id, this.currentFolderId).subscribe(movedFile => {
+        //   this.currentFiles.push(movedFile);
+        //   this.removeFromTree(file.id);
+        //   this.addToTree(movedFile);
+        // });
       }
     });
 
@@ -332,24 +331,24 @@ export class FileExplorerComponent implements OnInit, OnDestroy {
   deleteSelectedFiles(): void {
     if (confirm(`Are you sure you want to delete ${this.selectedFiles.length} item(s)?`)) {
       this.selectedFiles.forEach(fileId => {
-        this.fileService.deleteFile(fileId).subscribe(() => {
-          this.currentFiles = this.currentFiles.filter(f => f.id !== fileId);
-          this.removeFromTree(fileId);
-        });
+        // this.fileService.deleteFile(fileId).subscribe(() => {
+        //   this.currentFiles = this.currentFiles.filter(f => f.id !== fileId);
+        //   this.removeFromTree(fileId);
+        // });
       });
       this.selectedFiles = [];
     }
   }
 
   downloadFile(file: IUserFile): void {
-    this.fileService.downloadFile(file.id).subscribe(blob => {
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = file.fileName;
-      link.click();
-      window.URL.revokeObjectURL(url);
-    });
+    // this.fileService.downloadFile(file.id).subscribe(blob => {
+    //   const url = window.URL.createObjectURL(blob);
+    //   const link = document.createElement('a');
+    //   link.href = url;
+    //   link.download = file.fileName;
+    //   link.click();
+    //   window.URL.revokeObjectURL(url);
+    // });
   }
 
   refreshCurrentFolder(): void {
