@@ -7,7 +7,7 @@ import { IUserFile } from "../types";
 import { IGlobalState } from "../store";
 import { Store } from "@ngrx/store";
 import { TFileExplorerActionParams } from "../../components/file-explorer/libs";
-import { ICreateDirDTO, IFileDirListDTO, IPreviewFileDTO } from "../dtos";
+import { ICreateDirDTO, IFileDirListDTO, IPreviewFileDTO, IUploadFileDTO } from "../dtos";
 
 @Injectable({
   providedIn: 'root',
@@ -40,6 +40,10 @@ export class FileExplorerService {
 
   create(createDirDTO: ICreateDirDTO) {
     this.fileExplorerActor.send({ type: 'event_creating', params: createDirDTO });
+  }
+
+  uploadFile(uploadFileDTO: IUploadFileDTO) {
+    this.fileExplorerActor.send({ type: 'event_uploading', params: uploadFileDTO });
   }
 
   previewFile(previewFileDTO: IPreviewFileDTO) {

@@ -43,6 +43,8 @@ export interface IFileExplorerPreviewingResponsePayload {
 
 export interface IFileExplorerCreatingResponsePayload extends IUserFile {}
 
+export interface IFileExplorerUploadingResponsePayload extends IUserFile {}
+
 export interface IErrorObject {
   code: EError;
   message: string;

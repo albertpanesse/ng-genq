@@ -1,0 +1,24 @@
+<div class="file-grid" *ngIf="files.length > 0; else emptyState">
+  <div *ngFor="let file of files">
+    <div *ngIf="!file.isDir" class="file-item"
+      [class.selected]="selectedFiles.includes(file.id)"
+      (click)="onFileClick(file, $event)" (dblclick)="onFileDoubleClick(file)"
+      (contextmenu)="onContextMenu(file, $event)"
+    >
+      <div class="file-icon" [ngClass]="getFileIconClass(file)">
+        <i [class]="getFileIcon(file)"></i>
+      </div>
+
+      <div class="file-name" [title]="file.title">
+        {{ file.title }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #emptyState>
+  <div class="text-center p-5">
+    <i class="cil-folder-open" style="font-size: 64px; color: #6c757d;"></i>
+    <p class="mt-3 text-muted">This folder is empty</p>
+  </div>
+</ng-template>

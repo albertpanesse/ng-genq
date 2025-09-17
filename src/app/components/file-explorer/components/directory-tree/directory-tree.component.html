@@ -17,7 +17,7 @@
       *ngIf="node.expanded && node.children?.length"
       [treeData]="node.children || []"
       [depth]="depth + 1"
-      (onSelect)="onSelect.emit(node)"
+      (onSelect)="onSelect.emit($event)"
     ></directory-tree-comp>
   </ng-container>
 </div>

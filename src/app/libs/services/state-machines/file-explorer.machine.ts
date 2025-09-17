@@ -1,12 +1,12 @@
 import { assign, fromPromise, setup } from "xstate";
-import { ICommonFunctionResult, IErrorResponsePayload, IFileExplorerCreatingResponsePayload, IFileExplorerListingResponsePayload, IFileExplorerPreviewingResponsePayload } from "../../types";
+import { ICommonFunctionResult, IErrorResponsePayload, IFileExplorerCreatingResponsePayload, IFileExplorerListingResponsePayload, IFileExplorerPreviewingResponsePayload, IFileExplorerUploadingResponsePayload } from "../../types";
 import { creating, deleting, listing, moving, uploading, previewing } from "../apis";
 import { ApiService, CommonService, EAlertType, IAlert } from "..";
 import { IRootContext } from ".";
 import { IGlobalState } from "../../store";
 import { Store } from "@ngrx/store";
 import { setFileContentAction, setFileDirListAction, setUserFileAction } from "../../store/actions";
-import { ICreateDirDTO, IFileDirListDTO } from "../../dtos";
+import { ICreateDirDTO, IFileDirListDTO, IPreviewFileDTO, IUploadFileDTO } from "../../dtos";
 
 export interface IStateFileExplorerServices {
   apiService: ApiService;
@@ -17,9 +17,8 @@ export interface IStateFileExplorerServices {
 export interface IStateFileExplorerContext {
   createDirDTO: ICreateDirDTO;
   fileDirListDTO: IFileDirListDTO;
-  params: {
-    previewing: IEventFileExplorerPreviewingParams;
-  };
+  uploadFileDTO: IUploadFileDTO;
+  previewFileDTO: IPreviewFileDTO;
   isError: boolean;
   errorDetails: any;
 };
@@ -36,8 +35,8 @@ interface IEventFileExplorerMovingParams {}
 interface IEventFileExplorerDeletingParams {}
 
 interface IEventFileExplorerPreviewingParams {
-  userFileId: number;
-  numberOfLine: number;
+  user_file_id: number;
+  number_of_line: number;
 }
 
 export const fileExplorerStateMachine = setup({
@@ -45,7 +44,7 @@ export const fileExplorerStateMachine = setup({
     context: {} as IRootContext<IStateFileExplorerServices, IStateFileExplorerContext>,
     events: {} as IStateFileExplorerEvent<'event_listing', IFileDirListDTO> |
       IStateFileExplorerEvent<'event_creating', ICreateDirDTO> |
-      IStateFileExplorerEvent<'event_uploading', IEventFileExplorerUploadingParams> |
+      IStateFileExplorerEvent<'event_uploading', IUploadFileDTO> |
       IStateFileExplorerEvent<'event_moving', IEventFileExplorerMovingParams> |
       IStateFileExplorerEvent<'event_deleting', IEventFileExplorerDeletingParams> |
       IStateFileExplorerEvent<'event_previewing', IEventFileExplorerPreviewingParams>,
@@ -88,12 +87,8 @@ export const fileExplorerStateMachine = setup({
       context: {
         createDirDTO: {} as ICreateDirDTO,
         fileDirListDTO: {} as IFileDirListDTO,
-        params: {
-          previewing: {
-            userFileId: -1,
-            numberOfLine: 0,
-          }
-        },
+        uploadFileDTO: {} as IUploadFileDTO,
+        previewFileDTO: {} as IPreviewFileDTO,
         isError: false,
         errorDetails: null,
       },
@@ -118,13 +113,19 @@ export const fileExplorerStateMachine = setup({
               } as IStateFileExplorerContext),
             }),
           },
+          event_uploading: {
+            target: 'state_uploading',
+            actions: assign({
+              context: ({ event }) => ({
+                uploadFileDTO: event.params as IUploadFileDTO,
+              } as IStateFileExplorerContext)
+            }),
+          },
           event_previewing: {
             target: 'state_previewing',
             actions: assign({
               context: ({ event }) => ({
-                params: {
-                  previewing: event.params,
-                },
+                previewFileDTO: event.params as IPreviewFileDTO,
               } as IStateFileExplorerContext)
             }),
           },
@@ -213,10 +214,52 @@ export const fileExplorerStateMachine = setup({
         entry: [{ type: 'action_showAlert' }],
         always: [{ target: 'state_idle' }],
       },
+      state_uploading: {
+        invoke: {
+          src: 'actor_uploading',
+          input: ({ context: { services: { apiService }, context: { uploadFileDTO } } }) => ({ apiService, uploadFileDTO }),
+          onDone: {
+            target: 'state_afterUploading',
+            actions: [
+              { type: 'action_resetError' },
+              ({ context, event }) => {
+                const apiResponse = event.output;
+                if (apiResponse?.success) {
+                  const uploadedFile = (apiResponse as ICommonFunctionResult<IFileExplorerUploadingResponsePayload>).functionResult;
+                  context.services.store.dispatch(setUserFileAction({ userFile: uploadedFile }));
+                } else {
+                  context.context.isError = true;
+                  context.context.errorDetails = (apiResponse as ICommonFunctionResult<IErrorResponsePayload>).functionResult;
+                }
+              },
+            ],
+          },
+        },
+      },
+      state_afterUploading: {
+        always: [
+          {
+            guard: 'guard_isError',
+            target: 'state_uploadingError',
+          },
+          {
+            target: 'state_uploadingSuccess',
+          },
+        ],
+      },
+      state_uploadingError: {
+        entry: [{ type: 'action_showAlert' }],
+        always: [{ target: 'state_idle' }],
+        exit: [{ type: 'action_resetError' }],
+      },
+      state_uploadingSuccess: {
+        entry: [{ type: 'action_showAlert' }],
+        always: [{ target: 'state_idle' }],
+      },
       state_previewing: {
         invoke: {
           src: 'actor_previewing',
-          input: ({ context: { services: { apiService }, context: { params } } }) => ({ apiService, params: params.previewing }),
+          input: ({ context: { services: { apiService }, context: { previewFileDTO } } }) => ({ apiService, previewFileDTO }),
           onDone: {
             target: 'state_afterPreviewing',
             actions: [

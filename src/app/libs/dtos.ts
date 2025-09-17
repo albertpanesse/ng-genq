@@ -9,10 +9,15 @@ export interface ICreateDirDTO {
 }
 
 export interface IFileDirListDTO {
-  userFileId: number;
+  user_file_id: number;
+}
+
+export interface IUploadFileDTO {
+  file: File;
+  parent_id: number;
 }
 
 export interface IPreviewFileDTO {
-  userFileId: number;
-  numberOfLine: number;
+  user_file_id: number;
+  number_of_line: number;
 }

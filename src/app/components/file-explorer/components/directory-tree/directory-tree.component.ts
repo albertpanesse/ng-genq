@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges } from '@angular/core';
 import { ITreeNode } from '../../../../libs/types';
 
 @Component({
@@ -11,11 +11,15 @@ import { ITreeNode } from '../../../../libs/types';
   ],
   styleUrls: ['./directory-tree.component.scss'],
 })
-export class DirectoryTreeComponent {
+export class DirectoryTreeComponent implements OnChanges {
   @Input() treeData: ITreeNode[] = [];
   @Input() depth = 0;
 
   @Output() onSelect = new EventEmitter<ITreeNode>();
+
+  ngOnChanges(): void {
+    console.log('DirectoryTreeComponent initialized with data:', this.treeData);
+  }
 
   _onSelect(node: ITreeNode, event: MouseEvent) {
     event.stopPropagation();
